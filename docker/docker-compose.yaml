@@ -1,0 +1,83 @@
+version: '2.1'
+
+services:
+  zookeeper:
+    image: confluent/zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      zk_id: "1"
+  postgres:
+    image: postgres:9.6-alpine
+    container_name: postgres
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ./postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+  broker:
+    image: markthub/druid:latest
+    container_name: broker
+    ports:
+      - "8082:8082"
+    environment:
+      ZOOKEEPER_SERVER: zookeeper:2181
+      DRUID_SERVICE: broker 
+      DRUID_HOST: 192.168.192.12
+      DRUID_SERVICE_PORT: 8082
+      DRUID_JVM_ARGS: "-server -Xms1G -Xmx1G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -XX:NewSize=1G -XX:MaxNewSize=1G -XX:MaxDirectMemorySize=2G -XX:+UseG1GC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
+  historical:
+    image: markthub/druid:latest
+    container_name: historical
+    ports:
+      - "8083:8083"
+    environment:
+      ZOOKEEPER_SERVER: zookeeper:2181
+      DRUID_SERVICE: historical 
+      DRUID_HOST: 192.168.192.12
+      DRUID_SERVICE_PORT: 8083
+      DRUID_JVM_ARGS: "-server -Xms1G -Xmx1G -XX:MaxDirectMemorySize=2G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -XX:NewSize=1G -XX:MaxNewSize=1G -XX:+UseConcMarkSweepGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"            
+  coordinator:
+    image: markthub/druid:latest
+    container_name: coordinator
+    ports:
+      - "8081:8081"
+    environment:
+      ZOOKEEPER_SERVER: zookeeper:2181
+      DRUID_SERVICE: coordinator 
+      DRUID_HOST: 192.168.192.12
+      DRUID_SERVICE_PORT: 8081
+      DRUID_JVM_ARGS: "-server -Xms256m -Xmx256m -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -Dderby.stream.error.file=var/druid/derby.log"
+  overlord:
+    image: markthub/druid:latest
+    container_name: overlord
+    ports:
+      - "8084:8084"
+    environment:
+      ZOOKEEPER_SERVER: zookeeper:2181
+      DRUID_SERVICE: overlord 
+      DRUID_HOST: 192.168.192.12
+      DRUID_SERVICE_PORT: 8084
+      DRUID_JVM_ARGS: "-server -Xms256m -Xmx256m -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
+  middlemanager:
+    image: markthub/druid:latest
+    container_name: middlemanager
+    ports:
+      - "8091:8091"
+    environment:
+      ZOOKEEPER_SERVER: zookeeper:2181
+      DRUID_SERVICE: middleManager 
+      DRUID_HOST: 192.168.192.12
+      DRUID_SERVICE_PORT: 8091
+      DRUID_JVM_ARGS: "-server -Xms64m -Xmx64m -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
+  router:
+    image: markthub/druid:latest
+    container_name: router
+    ports:
+      - "8888:8888"
+    environment:
+      ZOOKEEPER_SERVER: zookeeper:2181
+      DRUID_SERVICE: router 
+      DRUID_HOST: 192.168.192.12
+      DRUID_SERVICE_PORT: 8888
+      DRUID_JVM_ARGS: "-server -Xms64m -Xmx64m -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"      

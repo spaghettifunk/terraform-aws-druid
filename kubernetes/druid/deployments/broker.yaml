@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: broker
+  namespace: druid
+  labels:
+    app: broker
+spec:
+  serviceName: broker
+  replicas: 1
+  selector:
+    matchLabels:
+      app: broker
+  template:
+    metadata:
+      labels:
+        app: broker
+    spec:
+      terminationGracePeriodSeconds: 1800
+      containers:
+      - name: broker
+        image: markthub/druid:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          name: broker
+        resources:
+          limits:
+            cpu: "500m"
+            memory: 1Gi
+          requests:
+            cpu: "500m"
+            memory: 1Gi
+        securityContext:
+          capabilities:
+            add:
+              - IPC_LOCK
+        env:
+          - name: ZOOKEEPER_SERVER
+            value: "zk-cs.druid.svc.cluster.local"
+          - name: DRUID_SERVICE_PORT
+            value: "8080"
+          - name: DRUID_HOST
+            value: "broker-cs.druid.svc.cluster.local"
+          - name: DRUID_SERVICE
+            value: "broker"
+          - name: DRUID_JVM_ARGS
+            value: "-server -Xms1g -Xmx1g -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -XX:NewSize=512m -XX:MaxNewSize=512m -XX:MaxDirectMemorySize=1g -XX:+UseG1GC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"

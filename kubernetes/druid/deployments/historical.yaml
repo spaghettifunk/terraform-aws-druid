@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: historical
+  namespace: druid
+  labels:
+    app: historical
+spec:
+  serviceName: historical
+  replicas: 1
+  selector:
+    matchLabels:
+      app: historical
+  template:
+    metadata:
+      labels:
+        app: historical
+    spec:
+      terminationGracePeriodSeconds: 1800
+      containers:
+      - name: historical
+        image: markthub/druid:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8083
+          name: historical
+        resources:
+          limits:
+            cpu: "256m"
+            memory: 1Gi
+          requests:
+            cpu: "256m"
+            memory: 1Gi
+        securityContext:
+          capabilities:
+            add:
+              - IPC_LOCK
+        env:
+          - name: ZOOKEEPER_SERVER
+            value: "zk-cs.druid.svc.cluster.local"
+          - name: DRUID_SERVICE_PORT
+            value: "8083"
+          - name: DRUID_HOST
+            value: "historical-cs.druid.svc.cluster.local"
+          - name: DRUID_SERVICE
+            value: "historical"
+          - name: DRUID_JVM_ARGS
+            value: "-server -Xms1g -Xmx1g -XX:MaxDirectMemorySize=1g -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -XX:NewSize=1g -XX:MaxNewSize=1g -XX:+UseConcMarkSweepGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"

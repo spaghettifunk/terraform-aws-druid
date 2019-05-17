@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: coordinator
+  namespace: druid
+  labels:
+    app: coordinator
+spec:
+  serviceName: coordinator
+  replicas: 1
+  selector:
+    matchLabels:
+      app: coordinator
+  template:
+    metadata:
+      labels:
+        app: coordinator
+    spec:
+      terminationGracePeriodSeconds: 1800
+      containers:
+      - name: coordinator
+        image: markthub/druid:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8081
+          name: coordinator
+        resources:
+          limits:
+            cpu: "256m"
+            memory: 256Mi
+          requests:
+            cpu: "256m"
+            memory: 256Mi
+        securityContext:
+          capabilities:
+            add:
+              - IPC_LOCK
+        env:
+          - name: ZOOKEEPER_SERVER
+            value: "zk-cs.druid.svc.cluster.local"
+          - name: DRUID_SERVICE_PORT
+            value: "8081"
+          - name: DRUID_HOST
+            value: "coordinator-cs.druid.svc.cluster.local"
+          - name: DRUID_SERVICE
+            value: "coordinator"
+          - name: DRUID_JVM_ARGS
+            value: "-server -Xms256m -Xmx256m -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -Dderby.stream.error.file=var/druid/derby.log"

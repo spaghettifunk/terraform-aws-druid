@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: middlemanager
+  namespace: druid
+  labels:
+    app: middlemanager
+spec:
+  serviceName: middlemanager
+  replicas: 1
+  selector:
+    matchLabels:
+      app: middlemanager
+  template:
+    metadata:
+      labels:
+        app: middlemanager
+    spec:
+      terminationGracePeriodSeconds: 1800
+      containers:
+      - name: middlemanager
+        image: markthub/druid:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8091
+          name: middlemanager
+        resources:
+          limits:
+            cpu: "128m"
+            memory: 256Mi
+          requests:
+            cpu: "128m"
+            memory: 128Mi
+        securityContext:
+          capabilities:
+            add:
+              - IPC_LOCK
+        env:
+          - name: ZOOKEEPER_SERVER
+            value: "zk-cs.druid.svc.cluster.local"
+          - name: DRUID_SERVICE_PORT
+            value: "8091"
+          - name: DRUID_HOST
+            value: "mm-cs.druid.svc.cluster.local"
+          - name: DRUID_SERVICE
+            value: "middlemanager"
+          - name: DRUID_JVM_ARGS
+            value: "-server -Xms64m -Xmx64m -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
