@@ -27,7 +27,7 @@ spec:
         resources:
           limits:
             cpu: "256m"
-            memory: 1Gi
+            memory: 2Gi
           requests:
             cpu: "256m"
             memory: 1Gi
@@ -36,13 +36,15 @@ spec:
             add:
               - IPC_LOCK
         env:
+          - name: POSTGRES_URL
+            value: "postgres-cs.druid.svc.cluster.local"
           - name: ZOOKEEPER_SERVER
             value: "zk-cs.druid.svc.cluster.local"
           - name: DRUID_SERVICE_PORT
             value: "8083"
           - name: DRUID_HOST
-            value: "historical-cs.druid.svc.cluster.local"
+            value: "historical-hs.druid.svc.cluster.local"
           - name: DRUID_SERVICE
             value: "historical"
           - name: DRUID_JVM_ARGS
-            value: "-server -Xms1g -Xmx1g -XX:MaxDirectMemorySize=1g -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -XX:NewSize=1g -XX:MaxNewSize=1g -XX:+UseConcMarkSweepGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
+            value: "-server -Xms1G -Xmx1G -XX:MaxDirectMemorySize=2G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -XX:NewSize=1G -XX:MaxNewSize=1G -XX:+UseConcMarkSweepGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"

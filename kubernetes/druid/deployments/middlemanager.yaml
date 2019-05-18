@@ -36,13 +36,15 @@ spec:
             add:
               - IPC_LOCK
         env:
+          - name: POSTGRES_URL
+            value: "postgres-cs.druid.svc.cluster.local"
           - name: ZOOKEEPER_SERVER
             value: "zk-cs.druid.svc.cluster.local"
           - name: DRUID_SERVICE_PORT
             value: "8091"
           - name: DRUID_HOST
-            value: "mm-cs.druid.svc.cluster.local"
+            value: "mm-hs.druid.svc.cluster.local"
           - name: DRUID_SERVICE
-            value: "middlemanager"
+            value: "middleManager"
           - name: DRUID_JVM_ARGS
             value: "-server -Xms64m -Xmx64m -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"

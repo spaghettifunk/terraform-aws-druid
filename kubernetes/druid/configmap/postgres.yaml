@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  namespace: druid
+  labels:
+    app: postgres
+data:
+  POSTGRES_DB: druid
+  POSTGRES_USER: druid
+  POSTGRES_PASSWORD: druid

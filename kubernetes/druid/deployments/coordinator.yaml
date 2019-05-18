@@ -36,12 +36,14 @@ spec:
             add:
               - IPC_LOCK
         env:
+          - name: POSTGRES_URL
+            value: "postgres-cs.druid.svc.cluster.local"
           - name: ZOOKEEPER_SERVER
             value: "zk-cs.druid.svc.cluster.local"
           - name: DRUID_SERVICE_PORT
             value: "8081"
           - name: DRUID_HOST
-            value: "coordinator-cs.druid.svc.cluster.local"
+            value: "coordinator-hs.druid.svc.cluster.local"
           - name: DRUID_SERVICE
             value: "coordinator"
           - name: DRUID_JVM_ARGS

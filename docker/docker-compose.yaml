@@ -21,6 +21,7 @@ services:
     ports:
       - "8082:8082"
     environment:
+      POSTGRES_URL: postgres
       ZOOKEEPER_SERVER: zookeeper:2181
       DRUID_SERVICE: broker 
       DRUID_HOST: 192.168.192.12
@@ -32,17 +33,19 @@ services:
     ports:
       - "8083:8083"
     environment:
+      POSTGRES_URL: postgres
       ZOOKEEPER_SERVER: zookeeper:2181
       DRUID_SERVICE: historical 
       DRUID_HOST: 192.168.192.12
       DRUID_SERVICE_PORT: 8083
-      DRUID_JVM_ARGS: "-server -Xms1G -Xmx1G -XX:MaxDirectMemorySize=2G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -XX:NewSize=1G -XX:MaxNewSize=1G -XX:+UseConcMarkSweepGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"            
+      DRUID_JVM_ARGS: "-server -Xms1G -Xmx1G -XX:MaxDirectMemorySize=2G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -XX:NewSize=1G -XX:MaxNewSize=1G -XX:+UseConcMarkSweepGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
   coordinator:
     image: markthub/druid:latest
     container_name: coordinator
     ports:
       - "8081:8081"
     environment:
+      POSTGRES_URL: postgres
       ZOOKEEPER_SERVER: zookeeper:2181
       DRUID_SERVICE: coordinator 
       DRUID_HOST: 192.168.192.12
@@ -54,6 +57,7 @@ services:
     ports:
       - "8084:8084"
     environment:
+      POSTGRES_URL: postgres
       ZOOKEEPER_SERVER: zookeeper:2181
       DRUID_SERVICE: overlord 
       DRUID_HOST: 192.168.192.12
@@ -65,6 +69,7 @@ services:
     ports:
       - "8091:8091"
     environment:
+      POSTGRES_URL: postgres
       ZOOKEEPER_SERVER: zookeeper:2181
       DRUID_SERVICE: middleManager 
       DRUID_HOST: 192.168.192.12
@@ -76,6 +81,7 @@ services:
     ports:
       - "8888:8888"
     environment:
+      POSTGRES_URL: postgres
       ZOOKEEPER_SERVER: zookeeper:2181
       DRUID_SERVICE: router 
       DRUID_HOST: 192.168.192.12

@@ -1,36 +1,36 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: broker
+  name: router
   namespace: druid
   labels:
-    app: broker
+    app: router
 spec:
-  serviceName: broker
+  serviceName: router
   replicas: 1
   selector:
     matchLabels:
-      app: broker
+      app: router
   template:
     metadata:
       labels:
-        app: broker
+        app: router
     spec:
       terminationGracePeriodSeconds: 1800
       containers:
-      - name: broker
+      - name: router
         image: markthub/druid:latest
         imagePullPolicy: Always
         ports:
-        - containerPort: 8082
-          name: broker
+        - containerPort: 8888
+          name: router
         resources:
           limits:
-            cpu: "500m"
-            memory: 3Gi
+            cpu: "128m"
+            memory: 256Mi
           requests:
-            cpu: "500m"
-            memory: 1Gi
+            cpu: "128m"
+            memory: 128Mi
         securityContext:
           capabilities:
             add:
@@ -41,10 +41,10 @@ spec:
           - name: ZOOKEEPER_SERVER
             value: "zk-cs.druid.svc.cluster.local"
           - name: DRUID_SERVICE_PORT
-            value: "8082"
+            value: "8888"
           - name: DRUID_HOST
-            value: "broker-hs.druid.svc.cluster.local"
+            value: "router-hs.druid.svc.cluster.local"
           - name: DRUID_SERVICE
-            value: "broker"
+            value: "router"
           - name: DRUID_JVM_ARGS
-            value: "-server -Xms1G -Xmx1G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -XX:NewSize=1G -XX:MaxNewSize=1G -XX:MaxDirectMemorySize=3G -XX:+UseG1GC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
+            value: "-server -Xms64m -Xmx64m -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
