@@ -10,7 +10,7 @@ variable "aws_azs" {
 
 variable "instance_type" {
   type    = "string"
-  default = "m5.large"
+  default = "r5.xlarge"
 }
 
 variable "tags" {

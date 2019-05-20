@@ -49,9 +49,9 @@ spec:
         - name: ELECTION_TIME
           value: "3 mins"
         - name: ZK_NODES_LIST
-          value: "zk-0.zk-hs.druid.svc.cluster.local,zk-1.zk-hs.druid.svc.cluster.local,zk-2.zk-hs.druid.svc.cluster.local"
+          value: "zk-0.zk-hs.nifi.svc.cluster.local,zk-1.zk-hs.nifi.svc.cluster.local,zk-2.zk-hs.nifi.svc.cluster.local"
         - name: ZK_CONNECT_STRING
-          value: "zk-0.zk-hs.druid.svc.cluster.local,zk-1.zk-hs.druid.svc.cluster.local,zk-2.zk-hs.druid.svc.cluster.local"
+          value: "zk-0.zk-hs.nifi.svc.cluster.local,zk-1.zk-hs.nifi.svc.cluster.local,zk-2.zk-hs.nifi.svc.cluster.local"
         volumeMounts:
           - name: "data"
             mountPath: /opt/nifi/data

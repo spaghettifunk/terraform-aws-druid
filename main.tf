@@ -1,5 +1,5 @@
 module "vpc" {
-  source = "modules/vpc"
+  source = "./modules/vpc"
   azs    = "${var.aws_azs}"
 
   tags = {
@@ -11,12 +11,12 @@ module "vpc" {
 }
 
 module "ssh_key" {
-  source   = "modules/key"
+  source   = "./modules/key"
   key_name = "${terraform.workspace}-key-cluster"
 }
 
 module "eks" {
-  source    = "modules/eks"
+  source    = "./modules/eks"
   name      = "eks-admin"
   namespace = "kube-system"
 
@@ -36,19 +36,19 @@ module "eks" {
 }
 
 module "helm-tiller" {
-  source    = "modules/helm-tiller"
+  source    = "./modules/helm-tiller"
   name      = "tiller"
   namespace = "kube-system"
 }
 
 module "kubernetes-dashboard" {
-  source    = "modules/kubernetes-dashboard"
+  source    = "./modules/kubernetes-dashboard"
   name      = "kubernetes-dashboard"
   namespace = "kube-system"
 }
 
 module "cluster-autoscaler" {
-  source    = "modules/cluster-autoscaler"
+  source    = "./modules/cluster-autoscaler"
   name      = "cluster-autoscaler"
   namespace = "kube-system"
 
@@ -57,19 +57,19 @@ module "cluster-autoscaler" {
 }
 
 module "prometheus" {
-  source    = "modules/prometheus"
+  source    = "./modules/prometheus"
   name      = "prometheus"
   namespace = "kube-system"
 }
 
 module "grafana" {
-  source    = "modules/grafana"
+  source    = "./modules/grafana"
   name      = "grafana"
   namespace = "kube-system"
 }
 
 module "superset" {
-  source    = "modules/superset"
+  source    = "./modules/superset"
   name      = "superset"
   namespace = "superset"
 }

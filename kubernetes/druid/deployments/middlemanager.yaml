@@ -6,7 +6,7 @@ metadata:
   labels:
     app: middlemanager
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: middlemanager
@@ -25,11 +25,11 @@ spec:
           name: middlemanager
         resources:
           limits:
-            cpu: "256m"
-            memory: 6Gi
+            cpu: "512m"
+            memory: 8Gi
           requests:
-            cpu: "128m"
-            memory: 2Gi
+            cpu: "256m"
+            memory: 4Gi
         securityContext:
           capabilities:
             add:
@@ -48,7 +48,7 @@ spec:
           - name: DRUID_SERVICE
             value: "middleManager"
           - name: DRUID_JVM_ARGS
-            value: "-server -Xms2G -Xmx2G -XX:MaxDirectMemorySize=8G -Daws.region=eu-west-1 -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
+            value: "-server -Xms4G -Xmx4G -XX:MaxDirectMemorySize=12G -Daws.region=eu-west-1 -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
           - name: AWS_REGION
             value: eu-west-1
           - name: AWS_ACCESS_KEY

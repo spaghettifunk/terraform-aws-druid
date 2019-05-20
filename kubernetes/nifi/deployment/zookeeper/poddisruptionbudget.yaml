@@ -1,0 +1,10 @@
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: zk-pdb
+  namespace: nifi
+spec:
+  selector:
+    matchLabels:
+      app: zk
+  maxUnavailable: 1

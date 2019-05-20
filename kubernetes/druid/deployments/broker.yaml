@@ -25,10 +25,10 @@ spec:
           name: broker
         resources:
           limits:
-            cpu: "500m"
-            memory: 4Gi
+            cpu: "512m"
+            memory: 8Gi
           requests:
-            cpu: "500m"
+            cpu: "512m"
             memory: 4Gi
         securityContext:
           capabilities:
@@ -48,7 +48,7 @@ spec:
           - name: DRUID_SERVICE
             value: "broker"
           - name: DRUID_JVM_ARGS
-            value: "-server -Xms2G -Xmx2G -Daws.region=eu-west-1 -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -XX:NewSize=2G -XX:MaxNewSize=2G -XX:MaxDirectMemorySize=8G -XX:+UseG1GC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
+            value: "-server -Xms4G -Xmx4G -Daws.region=eu-west-1 -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -XX:NewSize=4G -XX:MaxNewSize=4G -XX:MaxDirectMemorySize=12G -XX:+UseG1GC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
           - name: AWS_REGION
             value: eu-west-1
           - name: AWS_ACCESS_KEY

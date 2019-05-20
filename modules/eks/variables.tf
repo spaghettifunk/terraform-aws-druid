@@ -45,7 +45,7 @@ variable "namespace" {
 
 variable "desired_capacity" {
   type        = "string"
-  default     = "2"
+  default     = "3"
   description = "Desired number of servers"
 }
 
@@ -57,6 +57,6 @@ variable "min_size" {
 
 variable "max_size" {
   type        = "string"
-  default     = "4"
+  default     = "6"
   description = "Maximun number of servers"
 }
