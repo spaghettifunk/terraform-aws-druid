@@ -1,12 +1,11 @@
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: middlemanager
   namespace: druid
   labels:
     app: middlemanager
 spec:
-  serviceName: middlemanager
   replicas: 1
   selector:
     matchLabels:
@@ -26,11 +25,11 @@ spec:
           name: middlemanager
         resources:
           limits:
-            cpu: "128m"
-            memory: 256Mi
+            cpu: "256m"
+            memory: 6Gi
           requests:
             cpu: "128m"
-            memory: 128Mi
+            memory: 2Gi
         securityContext:
           capabilities:
             add:
@@ -43,11 +42,13 @@ spec:
           - name: DRUID_SERVICE_PORT
             value: "8084"
           - name: DRUID_HOST
-            value: "mm-cs.druid.svc.cluster.local"
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
           - name: DRUID_SERVICE
             value: "middleManager"
           - name: DRUID_JVM_ARGS
-            value: "-server -Xms64m -Xmx64m -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
+            value: "-server -Xms2G -Xmx2G -XX:MaxDirectMemorySize=8G -Daws.region=eu-west-1 -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
           - name: AWS_REGION
             value: eu-west-1
           - name: AWS_ACCESS_KEY
@@ -70,7 +71,22 @@ spec:
               secretKeyRef:
                 name: druid-secret
                 key: aws_bucket_index
+        livenessProbe:
+          initialDelaySeconds: 60
+          httpGet:
+            path: /status/health
+            port: 8084
+        readinessProbe:
+          initialDelaySeconds: 60
+          httpGet:
+            path: /status/health
+            port: 8084     
+        volumeMounts:
+        - mountPath: /var/druid/
+          name: data
       volumes:
       - name: druid-secret
         secret:
           secretName: druid-secret
+      - name: data
+        emptyDir: {}

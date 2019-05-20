@@ -1,12 +1,11 @@
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: router
   namespace: druid
   labels:
     app: router
 spec:
-  serviceName: router
   replicas: 1
   selector:
     matchLabels:
@@ -27,10 +26,10 @@ spec:
         resources:
           limits:
             cpu: "128m"
-            memory: 256Mi
+            memory: 512Mi
           requests:
             cpu: "128m"
-            memory: 128Mi
+            memory: 256Mi
         securityContext:
           capabilities:
             add:
@@ -43,11 +42,13 @@ spec:
           - name: DRUID_SERVICE_PORT
             value: "8888"
           - name: DRUID_HOST
-            value: "router-hs.druid.svc.cluster.local"
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
           - name: DRUID_SERVICE
             value: "router"
           - name: DRUID_JVM_ARGS
-            value: "-server -Xms64m -Xmx64m -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
+            value: "-server -Xms256m -Xmx256m -Daws.region=eu-west-1 -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
           - name: AWS_REGION
             value: eu-west-1
           - name: AWS_ACCESS_KEY
@@ -70,7 +71,22 @@ spec:
               secretKeyRef:
                 name: druid-secret
                 key: aws_bucket_index
+        livenessProbe:
+          initialDelaySeconds: 60
+          httpGet:
+            path: /status/health
+            port: 8888
+        readinessProbe:
+          initialDelaySeconds: 60
+          httpGet:
+            path: /status/health
+            port: 8888     
+        volumeMounts:
+        - mountPath: /var/druid/
+          name: data
       volumes:
       - name: druid-secret
         secret:
           secretName: druid-secret
+      - name: data
+        emptyDir: {}
