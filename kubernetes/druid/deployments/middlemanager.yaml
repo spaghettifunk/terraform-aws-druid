@@ -22,7 +22,7 @@ spec:
         image: markthub/druid:latest
         imagePullPolicy: Always
         ports:
-        - containerPort: 8091
+        - containerPort: 8084
           name: middlemanager
         resources:
           limits:
@@ -41,10 +41,36 @@ spec:
           - name: ZOOKEEPER_SERVER
             value: "zk-cs.druid.svc.cluster.local"
           - name: DRUID_SERVICE_PORT
-            value: "8091"
+            value: "8084"
           - name: DRUID_HOST
-            value: "mm-hs.druid.svc.cluster.local"
+            value: "mm-cs.druid.svc.cluster.local"
           - name: DRUID_SERVICE
             value: "middleManager"
           - name: DRUID_JVM_ARGS
             value: "-server -Xms64m -Xmx64m -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
+          - name: AWS_REGION
+            value: eu-west-1
+          - name: AWS_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: druid-secret
+                key: aws_access_key
+          - name: AWS_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: druid-secret
+                key: aws_secret_key
+          - name: BUCKET_STORAGE
+            valueFrom:
+              secretKeyRef:
+                name: druid-secret
+                key: aws_bucket_storage
+          - name: BUCKET_INDEX
+            valueFrom:
+              secretKeyRef:
+                name: druid-secret
+                key: aws_bucket_index
+      volumes:
+      - name: druid-secret
+        secret:
+          secretName: druid-secret

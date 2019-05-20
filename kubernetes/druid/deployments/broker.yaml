@@ -43,8 +43,34 @@ spec:
           - name: DRUID_SERVICE_PORT
             value: "8082"
           - name: DRUID_HOST
-            value: "broker-hs.druid.svc.cluster.local"
+            value: "broker-cs.druid.svc.cluster.local"
           - name: DRUID_SERVICE
             value: "broker"
           - name: DRUID_JVM_ARGS
             value: "-server -Xms1G -Xmx1G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -XX:NewSize=1G -XX:MaxNewSize=1G -XX:MaxDirectMemorySize=3G -XX:+UseG1GC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
+          - name: AWS_REGION
+            value: eu-west-1
+          - name: AWS_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: druid-secret
+                key: aws_access_key
+          - name: AWS_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: druid-secret
+                key: aws_secret_key
+          - name: BUCKET_STORAGE
+            valueFrom:
+              secretKeyRef:
+                name: druid-secret
+                key: aws_bucket_storage
+          - name: BUCKET_INDEX
+            valueFrom:
+              secretKeyRef:
+                name: druid-secret
+                key: aws_bucket_index
+      volumes:
+      - name: druid-secret
+        secret:
+          secretName: druid-secret            

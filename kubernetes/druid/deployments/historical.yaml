@@ -26,7 +26,7 @@ spec:
           name: historical
         resources:
           limits:
-            cpu: "256m"
+            cpu: "512m"
             memory: 2Gi
           requests:
             cpu: "256m"
@@ -43,8 +43,34 @@ spec:
           - name: DRUID_SERVICE_PORT
             value: "8083"
           - name: DRUID_HOST
-            value: "historical-hs.druid.svc.cluster.local"
+            value: "historical-hs.druid"
           - name: DRUID_SERVICE
             value: "historical"
           - name: DRUID_JVM_ARGS
             value: "-server -Xms1G -Xmx1G -XX:MaxDirectMemorySize=2G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -XX:NewSize=1G -XX:MaxNewSize=1G -XX:+UseConcMarkSweepGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
+          - name: AWS_REGION
+            value: eu-west-1
+          - name: AWS_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: druid-secret
+                key: aws_access_key
+          - name: AWS_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: druid-secret
+                key: aws_secret_key
+          - name: BUCKET_STORAGE
+            valueFrom:
+              secretKeyRef:
+                name: druid-secret
+                key: aws_bucket_storage
+          - name: BUCKET_INDEX
+            valueFrom:
+              secretKeyRef:
+                name: druid-secret
+                key: aws_bucket_index
+      volumes:
+      - name: druid-secret
+        secret:
+          secretName: druid-secret
