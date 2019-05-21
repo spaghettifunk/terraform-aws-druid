@@ -49,6 +49,8 @@ spec:
             value: "middleManager"
           - name: DRUID_JVM_ARGS
             value: "-server -Xms4G -Xmx4G -XX:MaxDirectMemorySize=12G -Daws.region=eu-west-1 -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
+          - name: JVM_PEONS_ARGS
+            value: "-Daws.region=eu-west-1"
           - name: AWS_REGION
             value: eu-west-1
           - name: AWS_ACCESS_KEY

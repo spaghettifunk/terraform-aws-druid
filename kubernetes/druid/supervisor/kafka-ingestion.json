@@ -8,7 +8,7 @@
         "format": "json",
         "timestampSpec": {
           "column": "timestamp_ms",
-          "format": "millis"
+          "format": "auto"
         },
         "dimensionsSpec": {
           "dimensions": [
@@ -88,7 +88,7 @@
   },
   "tuningConfig": {
     "type": "kafka",
-    "maxRowsInMemory": 2000,
+    "maxRowsPerSegment": 5000000,
     "reportParseExceptions": false
   },
   "ioConfig": {
