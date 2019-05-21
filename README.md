@@ -4,9 +4,9 @@ Terraform script to spin-up a Kubernetes cluster where to install Druid. This wh
 
 ## Build the Infrastructure
 
-The first we need to do is to modify the `backend.tf` file in order to let `terraform` know, where it needs to store the state. If you can't use an S3 bucket, simply comment those lines, otherwise fill those lines in with the appropirate values.
+The first we need to do is to modify the `backend.tf` file in order to let `terraform` know, where it needs to store the state. If you can't use an S3 bucket, simply comment those lines, otherwise fill those lines in with the appropriate values.
 
-To make it more convenient, there is a dockerimage where there will be installed all the packages we need to spinup the cluster.
+To make it more convenient, there is a dockerimage where there will be installed all the packages we need to spin up the cluster.
 
 1. `make build`
 
@@ -37,11 +37,11 @@ docker run -it --rm \
 
 Now that we are inside the docker container we can call `terraform` and spin up our cluster. But not too fast. Check the `main.tf` file to understand what is going to be created.
 
-First of all we are going to create a dedicated VPC. This is not mandatory but for the sake of the project it's better to have everything isolated so it will be easy to remove the resources. Then, a brand new `SSH Key`. We could use an existing one but because we just need something to connect to the EC2 instances, we create ad-hoc. **Attention** though. We do not store the SSH Key so you'll not be able to SSH into the EC2 instances. As exercises, you could make that possible.
+First of all we are going to create a dedicated VPC. This is not mandatory but for the sake of the project it's better to have everything isolated so it will be easy to remove the resources. Then, a brand new `SSH Key`. We could use an existing one but because we just need something to connect to the EC2 instances, we create ad-hoc. **Attention** though. We do not store the SSH Key so you'll not be able to SSH into the EC2 instances. As exercise, you could make that possible.
 
 Moving on, the EKS cluster will be created and after that a set of applications that will be convenient to have for debugging purposes and as general good practice (`prometheus` and `grafana` in particular).
 
-To lunch the creation of the whole thing you simply need to run `make install`. Now, drink your coffee whilst looking at the thousands of lines of code on your STDOUT. This will take 15/20 minutes. If it fails, run `make install` again. Sometimes the `tiller` application is a bit weird and doesn't get installed correctly.
+To launch the creation of the whole thing you simply need to run `make install`. Now, drink your coffee whilst looking at the thousands of lines of code on your STDOUT. This will take 15/20 minutes. If it fails, run `make install` again. Sometimes the `tiller` application is a bit weird and doesn't get installed correctly.
 
 At the end you should see something like this
 
@@ -76,7 +76,7 @@ In order to use your normal shell with Kubernetes, you need to run two commands:
 1. `make config`
 2. `aws eks update-kubeconfig --name druid-eks`
 
-In this way it will either update your current Kubernetes context or it will download a new one. To make sure that everything is working, run `kubectl get pod --all-namespaces`. You should see somethig like this
+In this way it will either update your current Kubernetes context or it will download a new one. To make sure that everything is working, run `kubectl get pod --all-namespaces`. You should see something like this
 
 ```bash
 NAMESPACE     NAME                                                         READY   STATUS    RESTARTS   AGE
@@ -102,12 +102,12 @@ kube-system   tiller-deploy-6f6fd74b68-9pz2z                               1/1  
 superset      superset-555b475c7f-zlk65                                    1/1     Running   0          154m
 ```
 
-Now, it's time to install Kafka. Enter the folder `kubernetes/kafka` and then run `kubectl apply -f ns.yaml`. This will create the `kafka` namespace in the cluster. Once this is successfull, enter the `deployments` folder and run:
+Now, it's time to install Kafka. Enter the folder `kubernetes/kafka` and then run `kubectl apply -f ns.yaml`. This will create the `kafka` namespace in the cluster. Once this is successful, enter the `deployments` folder and run:
 
 1. `kubectl apply -f kafka-operator.yaml`
 2. `kubectl apply -f kafka-cluster.yaml`
 
-**Please keep that order** otherwise it will fail. The Kafka operator descriptors are necessary in order to spinup the brokers.
+**Please keep that order** otherwise it will fail. The Kafka operator descriptors are necessary in order to spin up the brokers.
 
 This should install a bunch of things and you should see something like the following
 
@@ -192,7 +192,7 @@ Now, start all the processors and see if everything works. If you receive `autho
 
 Once NiFi is working and tweets are being pushed to Kafka correctly, it's time to install Druid.
 
-**REMEBER** to update the `image` name in the deployments of Druid components so that the deployment itself will work. There are some things that need to be updated before we can proceed. Go to `kubernetes/druid/secrets` and change all the variables values with yours. **Remeber** to encode those values in Base64. Once you've done that, do `kubectl apply -f ns.yaml`. This will create the `druid` namespace in Kubernetes.
+**REMEMBER** to update the `image` name in the deployments of Druid components so that the deployment itself will work. There are some things that need to be updated before we can proceed. Go to `kubernetes/druid/secrets` and change all the variables values with yours. **Remember** to encode those values in Base64. Once you've done that, do `kubectl apply -f ns.yaml`. This will create the `druid` namespace in Kubernetes.
 
 Now, deploy in the following order
 
