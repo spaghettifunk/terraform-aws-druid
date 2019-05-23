@@ -201,7 +201,7 @@ Now, deploy in the following order
 3. `kubectl apply -f services/`
 4. `kubectl apply -f deployments/`
 
-It will take few minutes before it gets everything up and running. Once it's ready, you should be able to port-forward towards the Duid UI. To do so, run `kubectl port-forward --namespace druid svc/router-cs 8888:8888`, open your browser at `http://localhost:8888/unified-console.html#` and you should see the UI running. If you see 500 Errors within the boxes of the services, it means that it's not ready yet. Wait a little longer and then refresh. If it stays that way, you need to check where the error is.
+It will take few minutes before it gets everything up and running. Once it's ready, you should be able to port-forward towards the Druid UI. To do so, run `kubectl port-forward --namespace druid svc/router-cs 8888:8888`, open your browser at `http://localhost:8888/unified-console.html#` and you should see the UI running. If you see 500 Errors within the boxes of the services, it means that it's not ready yet. Wait a little longer and then refresh. If it stays that way, you need to check where the error is.
 
 ### 4. Test ingestion
 
