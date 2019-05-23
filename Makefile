@@ -31,6 +31,11 @@ uninstall:
 	@# Ignore errors in the Kubernetes uninstall
 	terraform destroy -auto-approve
 
+.PHONY: plan
+plan:
+	@# Check planned changes
+	terraform plan
+
 .PHONY: clean
 clean:
 	rm -rf .terraform
