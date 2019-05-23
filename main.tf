@@ -73,3 +73,9 @@ module "superset" {
   name      = "superset"
   namespace = "superset"
 }
+
+module "kube-state-metrics" {
+  source    = "./modules/kube-state-metrics"
+  name      = "kube-state-metrics"
+  namespace = "kube-system"
+}
