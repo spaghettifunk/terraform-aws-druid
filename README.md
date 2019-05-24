@@ -226,7 +226,3 @@ ORDER BY total DESC
 If you get a result it means that your data is ingested correctly.
 
 **YOUR JOB IS DONE! Many COMPLIMENTS!** Here a nice pic of a [puppy](https://previews.123rf.com/images/vauvau/vauvau1608/vauvau160801421/60771824-very-cute-puppy-hungarian-vizsla-in-the-dark-studio.jpg).
-
-## TODO
-
-- [ ] Fix S3 Deep Storage
