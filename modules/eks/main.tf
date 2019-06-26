@@ -11,17 +11,47 @@ module "eks-terraform" {
   cluster_version = "1.12"
 
   worker_groups = [
-    {
-      instance_type        = "${var.instance_type}"
+   {
+      name                 = "${var.general_worker_group["name"]}"
+      instance_type        = "${var.general_worker_group["instance_type"]}"
       key_name             = "${var.key_name}"
-      asg_desired_capacity = "${var.desired_capacity}"
-      asg_min_size         = "${var.min_size}"
-      asg_max_size         = "${var.max_size}"
+      asg_desired_capacity = "${var.general_worker_group["asg_desired_capacity"]}"
+      asg_min_size         = "${var.general_worker_group["asg_min_size"]}"
+      asg_max_size         = "${var.general_worker_group["asg_max_size"]}"
       autoscaling_enabled  = true
+      ebs_optimized = true
 
       # Workers are only deployed on the private networks for now      
       subnets = "${var.private_subnets}"
+
+      tags = [
+        {
+          key  = "type"
+          value = "general-purpose"
+          propagate_at_launch = true
+        }
+      ]
     },
+    {
+      name                 = "${var.mo_worker_group["name"]}"
+      instance_type        = "${var.mo_worker_group["instance_type"]}"
+      key_name             = "${var.key_name}"
+      asg_desired_capacity = "${var.mo_worker_group["asg_desired_capacity"]}"
+      asg_min_size         = "${var.mo_worker_group["asg_min_size"]}"
+      asg_max_size         = "${var.mo_worker_group["asg_max_size"]}"
+      autoscaling_enabled  = true
+      ebs_optimized = true
+
+      # Workers are only deployed on the private networks for now      
+      subnets = "${var.private_subnets}"
+      tags = [
+        {
+          key  = "type"
+          value = "memory-optimised"
+          propagate_at_launch = true
+        }
+      ]
+    }
   ]
 
   # Add ssh access

@@ -43,20 +43,26 @@ variable "namespace" {
   description = "Namespace name where the service account will be created on"
 }
 
-variable "desired_capacity" {
-  type        = "string"
-  default     = "3"
-  description = "Desired number of servers"
+variable "general_worker_group" {
+  type    = "map"
+  default = {
+    "name" = "general-purpose"
+    "instance_type" = "m4.xlarge"
+    "key_name" = "your-key"
+    "asg_desired_capacity" = "2"
+    "asg_min_size" = "1"
+    "asg_max_size" = "4"
+  }
 }
 
-variable "min_size" {
-  type        = "string"
-  default     = "2"
-  description = "Minimun number of servers"
-}
-
-variable "max_size" {
-  type        = "string"
-  default     = "6"
-  description = "Maximun number of servers"
+variable "mo_worker_group" {
+  type    = "map"
+  default = {
+    "name" = "memory-optimized"
+    "instance_type" = "r5.xlarge"
+    "key_name" = "your-key"
+    "asg_desired_capacity" = "1"
+    "asg_min_size" = "1"
+    "asg_max_size" = "1"
+  }
 }
