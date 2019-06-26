@@ -1,6 +1,6 @@
 module "eks-terraform" {
   source       = "terraform-aws-modules/eks/aws"
-  version      = "4.0.2"
+  version      = "5.0.0"
   cluster_name = "${var.cluster_name}"
 
   # Deploy in all possible networks. EKS cannot be changed afterwards
@@ -20,7 +20,7 @@ module "eks-terraform" {
       autoscaling_enabled  = true
 
       # Workers are only deployed on the private networks for now      
-      subnets = "${join(",", var.private_subnets)}"
+      subnets = "${var.private_subnets}"
     },
   ]
 

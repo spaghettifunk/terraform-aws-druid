@@ -4,12 +4,12 @@ variable "instance_type" {
 }
 
 variable "private_subnets" {
-  type        = "list"
+  type = list(string)
   description = "List of private subnet IDs where the worker nodes will be deployed"
 }
 
 variable "public_subnets" {
-  type        = "list"
+  type = list(string)
   description = "List of public subnet IDs where the EKS master will be deployed"
 }
 
