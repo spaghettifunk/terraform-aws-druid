@@ -5,7 +5,7 @@ module "eks-terraform" {
 
   # Deploy in all possible networks. EKS cannot be changed afterwards
   vpc_id  = "${var.vpc_id}"
-  subnets = ["${var.private_subnets}", "${var.public_subnets}"]
+  subnets = concat("${var.private_subnets}", "${var.public_subnets}")
 
   manage_aws_auth = true
   cluster_version = "1.12"
