@@ -24,7 +24,7 @@ data "aws_eks_cluster_auth" "cluster" {
 }
 
 provider "kubernetes" {
-  version                = "= 1.6.2"
+  version                = "= 1.7"
   host                   = "${data.aws_eks_cluster.cluster.endpoint}"
   cluster_ca_certificate = "${base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)}"
   token                  = "${data.aws_eks_cluster_auth.cluster.token}"
