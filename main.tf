@@ -4,7 +4,6 @@ module "vpc" {
 
   tags = {
     KubernetesCluster                 = "${terraform.workspace}-eks"
-    "kubernetes.io/role/internal-elb" = ""
     Terraform                         = "true"
     Environment                       = "${terraform.workspace}-vpc"
   }
