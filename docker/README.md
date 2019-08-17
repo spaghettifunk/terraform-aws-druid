@@ -74,11 +74,3 @@ docker run -it -e ZOOKEEPER_SERVER=192.168.0.102 -e DRUID_SERVICE=overlord -e DR
 ```bash
 docker run -it -e ZOOKEEPER_SERVER=192.168.0.102 -e DRUID_SERVICE=middleManager -e DRUID_HOST=192.168.0.102 -e DRUID_SERVICE_PORT=8091 -e DRUID_JVM_ARGS="-server -Xms64m -Xmx64m -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager" druid:latest
 ```
-
-## Hadoop Indexing with EMR
-
-There are some permissions issues
-
-```bash
-$: hdfs dfs -chown -R root:hdfs /var
-```
