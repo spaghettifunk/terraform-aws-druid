@@ -1,0 +1,26 @@
+# General
+druid.service=druid/${DRUID_SERVICE}
+druid.host=${DRUID_HOST}
+druid.plaintextPort=${DRUID_SERVICE_PORT}
+
+# HTTP server threads
+druid.server.http.numThreads=12
+
+# Segment storage
+druid.segmentCache.locations=[{"path":"var/druid/segment-cache","maxSize":300000000000}]
+druid.server.maxSize=300000000000
+
+# Logging
+druid.monitoring.monitors=["org.apache.druid.java.util.metrics.JvmMonitor"]
+
+# Processing threads and buffers
+druid.processing.buffer.sizeBytes=100000000
+druid.processing.numMergeBuffers=1
+druid.processing.numThreads=2
+druid.processing.tmpDir=var/druid/processing
+
+# Query cache
+druid.historical.cache.useCache=true
+druid.historical.cache.populateCache=true
+druid.cache.type=caffeine
+druid.cache.sizeInBytes=10000000

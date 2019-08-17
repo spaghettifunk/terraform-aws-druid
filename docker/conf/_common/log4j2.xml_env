@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Configuration status="WARN">
+    <Appenders>
+        <File name="Druid" fileName="/var/log/druid/${DRUID_SERVICE}.log">
+            <PatternLayout pattern="%d{ISO8601} %p [%t] %c - %m%n"/>
+        </File>
+        <Console name="STDOUT" target="SYSTEM_OUT">
+           <PatternLayout pattern="%d{ISO8601} %p [%t] %c - %m%n"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Root level="${LOG_LEVEL}">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="Druid"/>
+        </Root>
+    </Loggers>
+</Configuration>

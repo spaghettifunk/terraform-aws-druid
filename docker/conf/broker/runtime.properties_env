@@ -1,0 +1,24 @@
+# General
+druid.service=druid/${DRUID_SERVICE}
+druid.host=${DRUID_HOST}
+druid.plaintextPort=${DRUID_SERVICE_PORT}
+
+# HTTP
+druid.broker.http.numConnections=5
+druid.server.http.numThreads=9
+
+# Logging
+druid.monitoring.monitors=["org.apache.druid.java.util.metrics.JvmMonitor"]
+
+# Processing
+druid.processing.numThreads=2
+druid.processing.buffer.sizeBytes=256000000
+
+# Queries
+druid.query.groupBy.singleThreaded=false
+druid.query.topN.minTopNThreshold=100
+
+druid.broker.cache.useCache=true
+druid.broker.cache.populateCache=true
+druid.cache.type=local
+druid.cache.sizeInBytes=10000000

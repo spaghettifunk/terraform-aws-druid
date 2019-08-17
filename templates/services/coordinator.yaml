@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: coordinator-hs
+  namespace: ${namespace}
+  labels:
+    app: coordinator
+spec:
+  ports:
+  - port: 8081
+    name: coordinator
+  clusterIP: None
+  selector:
+    app: coordinator
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: coordinator-cs
+  namespace: ${namespace}
+  labels:
+    app: coordinator
+spec:
+  ports:
+  - port: 8081
+    name: coordinator
+  selector:
+    app: coordinator

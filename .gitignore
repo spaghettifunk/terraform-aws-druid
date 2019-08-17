@@ -10,5 +10,3 @@
 
 config-map*
 kubeconfig_*
-
-*/secrets/druid.yaml*

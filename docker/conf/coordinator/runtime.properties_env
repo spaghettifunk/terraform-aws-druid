@@ -1,0 +1,7 @@
+# General
+druid.service=druid/${DRUID_SERVICE}
+druid.host=${DRUID_HOST}
+druid.plaintextPort=${DRUID_SERVICE_PORT}
+
+druid.coordinator.startDelay=PT10S
+druid.coordinator.period=PT5S

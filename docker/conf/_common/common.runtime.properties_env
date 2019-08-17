@@ -1,0 +1,46 @@
+# Extensions
+druid.extensions.directory=/opt/druid/extensions
+druid.extensions.hadoopDependenciesDir=/opt/druid/hadoop-dependencies
+druid.extensions.loadList=["druid-kafka-indexing-service","druid-s3-extensions","postgresql-metadata-storage","druid-datasketches","druid-lookups-cached-global"]
+
+# Zookeeper
+druid.zk.paths.base=/druid
+druid.zk.service.host=${ZOOKEEPER_SERVER}
+
+# Logging
+druid.emitter=logging
+druid.emitter.logging.logLevel=${LOG_LEVEL}
+druid.startup.logging.logProperties=true
+
+# For PostgreSQL (make sure to additionally include the Postgres extension):
+druid.metadata.storage.type=postgresql
+druid.metadata.storage.connector.connectURI=jdbc:postgresql://${POSTGRES_URL}:5432/druid
+druid.metadata.storage.connector.user=${POSTGRES_USER}
+druid.metadata.storage.connector.password=${POSTGRES_PASSWORD}
+
+# Service discovery
+druid.selectors.indexing.serviceName=druid/overlord
+druid.selectors.coordinator.serviceName=druid/coordinator
+
+# Indexing service logs
+druid.indexer.logs.type=s3
+druid.indexer.logs.s3Bucket=${BUCKET_INDEX}
+druid.indexer.logs.s3Prefix=indexing-logs
+
+# Monitoring
+druid.monitoring.monitors=["org.apache.druid.java.util.metrics.JvmMonitor"]
+druid.emitter=logging
+druid.emitter.logging.logLevel=debug
+
+# Deep Storage
+druid.storage.type=s3
+druid.storage.bucket=${BUCKET_STORAGE}
+druid.storage.baseKey=segments
+druid.storage.useS3aSchema=True
+
+
+# Security
+druid.server.hiddenProperties=["druid.s3.accessKey","druid.s3.secretKey","druid.metadata.storage.connector.password"]
+
+# SQL
+druid.sql.enable=true

@@ -1,0 +1,17 @@
+# General
+druid.service=druid/${DRUID_SERVICE}
+druid.host=${DRUID_HOST}
+druid.plaintextPort=${DRUID_SERVICE_PORT}
+
+# HTTP proxy
+druid.router.http.numConnections=50
+druid.router.http.readTimeout=PT5M
+druid.router.http.numMaxThreads=100
+druid.server.http.numThreads=100
+
+# Service discovery
+druid.router.defaultBrokerServiceName=druid/broker
+druid.router.coordinatorServiceName=druid/coordinator
+
+# Management proxy to coordinator/overlord: required for unified web console.
+druid.router.managementProxy.enabled=true
