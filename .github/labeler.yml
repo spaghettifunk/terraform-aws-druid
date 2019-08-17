@@ -1,0 +1,17 @@
+docker:
+- docker/**/*
+
+kubernetes:
+- templates/**/*
+
+configmap: 
+- templates/configmap/**/*
+
+deployments: 
+- templates/deployments/**/*
+
+secrets: 
+- templates/secrets/**/*
+
+services: 
+- templates/services/**/*
