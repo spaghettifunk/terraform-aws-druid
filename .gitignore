@@ -7,6 +7,3 @@
 
 # .tfvars files
 *.tfvars
-
-config-map*
-kubeconfig_*
