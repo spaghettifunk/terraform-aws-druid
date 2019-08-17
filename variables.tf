@@ -33,16 +33,19 @@ variable "aws_bucket_index" {
 variable "postgres_db" {
   type        = "string"
   description = "Postgress Database name for Druid"
+  default     = "druid"
 }
 
 variable "postgres_user" {
   type        = "string"
   description = "Postgres username for accessing the DB"
+  default     = "druid"
 }
 
 variable "postgres_password" {
   type        = "string"
   description = "Postgress Password of the user"
+  default     = "druid"
 }
 
 // Druid variables
