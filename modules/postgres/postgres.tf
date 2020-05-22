@@ -1,7 +1,13 @@
+resource "kubernetes_namespace" "postgres_druid" {
+  metadata {
+    name = var.namespace
+  }
+}
+
 resource "kubernetes_config_map" "postgres_config" {
   metadata {
     name      = "postgres-config"
-    namespace = "$${namespace}"
+    namespace = kubernetes_namespace.postgres_druid
 
     labels = {
       app = "postgres"
@@ -9,17 +15,16 @@ resource "kubernetes_config_map" "postgres_config" {
   }
 
   data = {
-    POSTGRES_DB = "$${postgres_db}"
-    POSTGRES_PASSWORD = "$${postgres_password}"
-    POSTGRES_USER = "$${postgres_user}"
+    POSTGRES_DB       = var.db_name
+    POSTGRES_PASSWORD = var.db_password
+    POSTGRES_USER     = var.db_username
   }
 }
-
 
 resource "kubernetes_service" "postgres_hs" {
   metadata {
     name      = "postgres-hs"
-    namespace = "$${namespace}"
+    namespace = kubernetes_namespace.postgres_druid
 
     labels = {
       app = "postgres"
@@ -43,7 +48,7 @@ resource "kubernetes_service" "postgres_hs" {
 resource "kubernetes_service" "postgres_cs" {
   metadata {
     name      = "postgres-cs"
-    namespace = "$${namespace}"
+    namespace = kubernetes_namespace.postgres_druid
 
     labels = {
       app = "postgres"
@@ -63,9 +68,15 @@ resource "kubernetes_service" "postgres_cs" {
 }
 
 resource "kubernetes_stateful_set" "postgres" {
+  depends_on = [
+    kubernetes_service.postgres_hs,
+    kubernetes_service.postgres_cs,
+    kubernetes_config_map.postgres_config
+  ]
+
   metadata {
     name      = "postgres"
-    namespace = "$${namespace}"
+    namespace = kubernetes_namespace.postgres_druid
   }
 
   spec {
