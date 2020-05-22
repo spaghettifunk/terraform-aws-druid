@@ -1,7 +1,7 @@
 resource "kubernetes_service" "broker_hs" {
   metadata {
     name      = "broker-hs"
-    namespace = "$${namespace}"
+    namespace = var.namespace
 
     labels = {
       app = "broker"
@@ -25,7 +25,7 @@ resource "kubernetes_service" "broker_hs" {
 resource "kubernetes_service" "broker_cs" {
   metadata {
     name      = "broker-cs"
-    namespace = "$${namespace}"
+    namespace = var.namespace
 
     labels = {
       app = "broker"
@@ -47,7 +47,7 @@ resource "kubernetes_service" "broker_cs" {
 resource "kubernetes_deployment" "broker" {
   metadata {
     name      = "broker"
-    namespace = "$${namespace}"
+    namespace = var.namespace
 
     labels = {
       app = "broker"
@@ -55,7 +55,7 @@ resource "kubernetes_deployment" "broker" {
   }
 
   spec {
-    replicas = 1
+    replicas = var.broker_replicas
 
     selector {
       match_labels = {
@@ -85,7 +85,7 @@ resource "kubernetes_deployment" "broker" {
 
         container {
           name  = "broker"
-          image = "$${druid_image}:$${druid_tag}"
+          image = local.druid_image
 
           port {
             name           = "broker"

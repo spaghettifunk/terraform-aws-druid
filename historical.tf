@@ -1,7 +1,7 @@
 resource "kubernetes_service" "historical_hs" {
   metadata {
     name      = "historical-hs"
-    namespace = "$${namespace}"
+    namespace = var.namespace
 
     labels = {
       app = "historical"
@@ -25,7 +25,7 @@ resource "kubernetes_service" "historical_hs" {
 resource "kubernetes_service" "historical_cs" {
   metadata {
     name      = "historical-cs"
-    namespace = "$${namespace}"
+    namespace = var.namespace
 
     labels = {
       app = "historical"
@@ -49,7 +49,7 @@ resource "kubernetes_service" "historical_cs" {
 resource "kubernetes_deployment" "historical" {
   metadata {
     name      = "historical"
-    namespace = "$${namespace}"
+    namespace = var.namespace
 
     labels = {
       app = "historical"
@@ -57,7 +57,7 @@ resource "kubernetes_deployment" "historical" {
   }
 
   spec {
-    replicas = 1
+    replicas = var.historical_replicas
 
     selector {
       match_labels = {

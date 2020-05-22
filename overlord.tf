@@ -1,7 +1,7 @@
 resource "kubernetes_service" "overlord_hs" {
   metadata {
     name      = "overlord-hs"
-    namespace = "$${namespace}"
+    namespace = var.namespace
 
     labels = {
       app = "overlord"
@@ -25,7 +25,7 @@ resource "kubernetes_service" "overlord_hs" {
 resource "kubernetes_service" "overlord_cs" {
   metadata {
     name      = "overlord-cs"
-    namespace = "$${namespace}"
+    namespace = var.namespace
 
     labels = {
       app = "overlord"
@@ -44,12 +44,10 @@ resource "kubernetes_service" "overlord_cs" {
   }
 }
 
-
-
 resource "kubernetes_deployment" "overlord" {
   metadata {
     name      = "overlord"
-    namespace = "$${namespace}"
+    namespace = var.namespace
 
     labels = {
       app = "overlord"
@@ -57,7 +55,7 @@ resource "kubernetes_deployment" "overlord" {
   }
 
   spec {
-    replicas = 1
+    replicas = var.overlord_replicas
 
     selector {
       match_labels = {

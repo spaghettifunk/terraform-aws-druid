@@ -1,7 +1,7 @@
 resource "kubernetes_service" "coordinator_hs" {
   metadata {
     name      = "coordinator-hs"
-    namespace = "$${namespace}"
+    namespace = var.namespace
 
     labels = {
       app = "coordinator"
@@ -25,7 +25,7 @@ resource "kubernetes_service" "coordinator_hs" {
 resource "kubernetes_service" "coordinator_cs" {
   metadata {
     name      = "coordinator-cs"
-    namespace = "$${namespace}"
+    namespace = var.namespace
 
     labels = {
       app = "coordinator"
@@ -49,7 +49,7 @@ resource "kubernetes_service" "coordinator_cs" {
 resource "kubernetes_deployment" "coordinator" {
   metadata {
     name      = "coordinator"
-    namespace = "$${namespace}"
+    namespace = var.namespace
 
     labels = {
       app = "coordinator"
@@ -57,7 +57,7 @@ resource "kubernetes_deployment" "coordinator" {
   }
 
   spec {
-    replicas = 1
+    replicas = var.coordinator_replicas
 
     selector {
       match_labels = {

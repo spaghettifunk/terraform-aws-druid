@@ -1,7 +1,7 @@
 resource "kubernetes_service" "mm_hs" {
   metadata {
     name      = "mm-hs"
-    namespace = "$${namespace}"
+    namespace = var.namespace
 
     labels = {
       app = "middlemanager"
@@ -25,7 +25,7 @@ resource "kubernetes_service" "mm_hs" {
 resource "kubernetes_service" "mm_cs" {
   metadata {
     name      = "mm-cs"
-    namespace = "$${namespace}"
+    namespace = var.namespace
 
     labels = {
       app = "middlemanager"
@@ -49,7 +49,7 @@ resource "kubernetes_service" "mm_cs" {
 resource "kubernetes_deployment" "middlemanager" {
   metadata {
     name      = "middlemanager"
-    namespace = "$${namespace}"
+    namespace = var.namespace
 
     labels = {
       app = "middlemanager"
@@ -57,7 +57,7 @@ resource "kubernetes_deployment" "middlemanager" {
   }
 
   spec {
-    replicas = 1
+    replicas = var.middlemanager_replicas
 
     selector {
       match_labels = {

@@ -1,7 +1,7 @@
 resource "kubernetes_service" "router_hs" {
   metadata {
     name      = "router-hs"
-    namespace = "$${namespace}"
+    namespace = var.namespace
 
     labels = {
       app = "router"
@@ -25,7 +25,7 @@ resource "kubernetes_service" "router_hs" {
 resource "kubernetes_service" "router_cs" {
   metadata {
     name      = "router-cs"
-    namespace = "$${namespace}"
+    namespace = var.namespace
 
     labels = {
       app = "router"
@@ -44,12 +44,10 @@ resource "kubernetes_service" "router_cs" {
   }
 }
 
-
-
 resource "kubernetes_deployment" "router" {
   metadata {
     name      = "router"
-    namespace = "$${namespace}"
+    namespace = var.namespace
 
     labels = {
       app = "router"
@@ -57,7 +55,7 @@ resource "kubernetes_deployment" "router" {
   }
 
   spec {
-    replicas = 1
+    replicas = var.router_replicas
 
     selector {
       match_labels = {
