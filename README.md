@@ -1,3 +1,5 @@
+![Lint](https://github.com/spaghettifunk/druid-terraform/workflows/Lint/badge.svg?branch=master)
+
 # Druid terraform
 
 This is a Terraform module for installing Druid on your Kubernetes cluster. This modules uses normal Kubernetes definitions files instead of the Helm Chart. Despite the Helm chart would make this module way more smaller, we think that for faster testing and deployment, it would have been simpler using multiple yaml files rather then templating.
