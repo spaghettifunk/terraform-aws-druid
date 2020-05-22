@@ -1,4 +1,5 @@
 resource "kubernetes_service" "broker_hs" {
+
   metadata {
     name      = "broker-hs"
     namespace = var.namespace
@@ -56,7 +57,6 @@ resource "kubernetes_deployment" "broker" {
 
   spec {
     replicas = var.broker_replicas
-
     selector {
       match_labels = {
         app = "broker"
@@ -137,7 +137,7 @@ resource "kubernetes_deployment" "broker" {
             secret_ref {
               name = "druid-secret"
             }
-          }          
+          }
 
           resources {
             limits {
