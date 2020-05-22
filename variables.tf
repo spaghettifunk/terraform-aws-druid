@@ -29,25 +29,6 @@ variable "aws_bucket_index" {
   description = "S3 bucket for storing the indexes"
 }
 
-// Postgres variables
-variable "postgres_db" {
-  type        = "string"
-  description = "Postgress Database name for Druid"
-  default     = "druid"
-}
-
-variable "postgres_user" {
-  type        = "string"
-  description = "Postgres username for accessing the DB"
-  default     = "druid"
-}
-
-variable "postgres_password" {
-  type        = "string"
-  description = "Postgress Password of the user"
-  default     = "druid"
-}
-
 // Druid variables
 variable "druid_image" {
   type        = "string"
@@ -96,8 +77,41 @@ variable "router_replicas" {
   default     = 1
 }
 
+// Zookeeper variables
+variable "create_zookeeper" {
+  description = "Controls if Zookeeper resources should be created (it affects almost all resources)"
+  type        = bool
+  default     = true
+}
+
 variable "zookeeper_replicas" {
   type        = "number"
   description = "Number of replicas for the Zookeeper service"
   default     = 3
+}
+
+// Postgres variables
+variable "create_postgres" {
+  description = "Controls if Postgres database resources should be created (it affects almost all resources)"
+  type        = bool
+  default     = true
+}
+
+// Postgres variables
+variable "postgres_db" {
+  type        = "string"
+  description = "Postgress Database name for Druid"
+  default     = "druid"
+}
+
+variable "postgres_user" {
+  type        = "string"
+  description = "Postgres username for accessing the DB"
+  default     = "druid"
+}
+
+variable "postgres_password" {
+  type        = "string"
+  description = "Postgress Password of the user"
+  default     = "druid"
 }

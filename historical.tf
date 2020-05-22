@@ -135,58 +135,9 @@ resource "kubernetes_deployment" "historical" {
             value = "-server -Xms4G -Xmx4G -XX:MaxDirectMemorySize=12G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -XX:NewSize=4G -XX:MaxNewSize=4G -XX:+UseConcMarkSweepGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
           }
 
-          env {
-            name = "AWS_REGION"
-
-            value_from {
-              secret_key_ref {
-                name = "druid-secret"
-                key  = "aws_region"
-              }
-            }
-          }
-
-          env {
-            name = "AWS_ACCESS_KEY"
-
-            value_from {
-              secret_key_ref {
-                name = "druid-secret"
-                key  = "aws_access_key"
-              }
-            }
-          }
-
-          env {
-            name = "AWS_SECRET_KEY"
-
-            value_from {
-              secret_key_ref {
-                name = "druid-secret"
-                key  = "aws_secret_key"
-              }
-            }
-          }
-
-          env {
-            name = "BUCKET_STORAGE"
-
-            value_from {
-              secret_key_ref {
-                name = "druid-secret"
-                key  = "aws_bucket_storage"
-              }
-            }
-          }
-
-          env {
-            name = "BUCKET_INDEX"
-
-            value_from {
-              secret_key_ref {
-                name = "druid-secret"
-                key  = "aws_bucket_index"
-              }
+          env_from {
+            secret_ref {
+              name = "druid-secret"
             }
           }
 

@@ -140,58 +140,9 @@ resource "kubernetes_deployment" "middlemanager" {
             value = "-Daws.region=eu-west-1"
           }
 
-          env {
-            name = "AWS_REGION"
-
-            value_from {
-              secret_key_ref {
-                name = "druid-secret"
-                key  = "aws_region"
-              }
-            }
-          }
-
-          env {
-            name = "AWS_ACCESS_KEY"
-
-            value_from {
-              secret_key_ref {
-                name = "druid-secret"
-                key  = "aws_access_key"
-              }
-            }
-          }
-
-          env {
-            name = "AWS_SECRET_KEY"
-
-            value_from {
-              secret_key_ref {
-                name = "druid-secret"
-                key  = "aws_secret_key"
-              }
-            }
-          }
-
-          env {
-            name = "BUCKET_STORAGE"
-
-            value_from {
-              secret_key_ref {
-                name = "druid-secret"
-                key  = "aws_bucket_storage"
-              }
-            }
-          }
-
-          env {
-            name = "BUCKET_INDEX"
-
-            value_from {
-              secret_key_ref {
-                name = "druid-secret"
-                key  = "aws_bucket_index"
-              }
+          env_from {
+            secret_ref {
+              name = "druid-secret"
             }
           }
 
