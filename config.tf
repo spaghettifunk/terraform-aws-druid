@@ -7,7 +7,7 @@ resource "kubernetes_config_map" "common_config" {
   data = {
     POSTGRES_URL      = local.postgres_url
     POSTGRES_PORT     = var.postgres_port
-    POSTGRES_USER     = var.postgres_username
+    POSTGRES_USER     = var.postgres_user
     POSTGRES_PASSWORD = var.postgres_password
     POSTGRES_DB       = var.postgres_db
     ZOOKEEPER_SERVER  = local.zookeeper_server
