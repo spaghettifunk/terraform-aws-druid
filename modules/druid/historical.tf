@@ -118,8 +118,8 @@ resource "kubernetes_deployment" "historical" {
 
           resources {
             limits {
-              cpu    = "512m"
               memory = "8Gi"
+              cpu    = "512m"
             }
           }
 

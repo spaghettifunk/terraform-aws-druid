@@ -7,7 +7,7 @@ variable "enable" {
 variable "namespace" {
   type        = string
   description = "postgres namespace where the resource will be installed"
-  default     = "postgres-druid"
+  default     = "druid"
 }
 
 variable "config_map_name" {

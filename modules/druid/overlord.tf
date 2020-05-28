@@ -118,8 +118,8 @@ resource "kubernetes_deployment" "overlord" {
 
           resources {
             limits {
-              cpu    = "512m"
               memory = "2Gi"
+              cpu    = "512m"
             }
           }
 

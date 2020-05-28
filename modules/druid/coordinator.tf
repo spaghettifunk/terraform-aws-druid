@@ -118,8 +118,8 @@ resource "kubernetes_deployment" "coordinator" {
 
           resources {
             limits {
-              cpu    = "256m"
               memory = "2Gi"
+              cpu    = "256m"
             }
           }
 

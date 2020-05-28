@@ -1,17 +1,9 @@
-resource "kubernetes_namespace" "postgres_druid" {
-  count = var.enable ? 1 : 0
-
-  metadata {
-    name = var.namespace
-  }
-}
-
 resource "kubernetes_service" "postgres_hs" {
   count = var.enable ? 1 : 0
 
   metadata {
     name      = "postgres-hs"
-    namespace = kubernetes_namespace.postgres_druid[count.index].metadata.0.name
+    namespace = var.namespace
 
     labels = {
       app = "postgres"
@@ -37,7 +29,7 @@ resource "kubernetes_service" "postgres_cs" {
 
   metadata {
     name      = "postgres-cs"
-    namespace = kubernetes_namespace.postgres_druid[count.index].metadata.0.name
+    namespace = var.namespace
 
     labels = {
       app = "postgres"
@@ -66,7 +58,7 @@ resource "kubernetes_stateful_set" "postgres" {
 
   metadata {
     name      = "postgres"
-    namespace = kubernetes_namespace.postgres_druid[count.index].metadata.0.name
+    namespace = var.namespace
   }
 
   spec {

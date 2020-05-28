@@ -95,7 +95,7 @@ resource "kubernetes_stateful_set" "zk" {
   }
 
   spec {
-    replicas = 1
+    replicas = var.replicas
 
     selector {
       match_labels = {

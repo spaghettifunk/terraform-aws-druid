@@ -11,7 +11,7 @@ variable "namespace" {
 }
 
 variable "replicas" {
-  type        = string
+  type        = number
   description = "number of replicas used for the resource. For HA use an odd number"
-  default     = "3"
+  default     = 3
 }

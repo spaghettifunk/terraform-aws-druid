@@ -26,7 +26,7 @@ variable "druid_image_tag" {
 variable "broker_replicas" {
   type        = number
   description = "Number of replicas for the Broker service"
-  default     = 1
+  default     = 3
 }
 
 variable "tolerations_broker" {
@@ -158,8 +158,8 @@ variable "zookeeper_replicas" {
 
 // Postgres variables
 variable "create_postgres" {
-  description = "Controls if Postgres database resources should be created (it affects almost all resources)"
   type        = bool
+  description = "Controls if Postgres database resources should be created (it affects almost all resources)"
   default     = true
 }
 
