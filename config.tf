@@ -7,7 +7,7 @@ resource "kubernetes_namespace" "druid" {
 resource "kubernetes_config_map" "common_config" {
   metadata {
     name      = "druid-common-config"
-    namespace = kubernetes_namespace.druid.metadata.0.metadata.name
+    namespace = kubernetes_namespace.druid.metadata.0.name
   }
 
   data = {
