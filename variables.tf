@@ -8,7 +8,7 @@ variable "namespace" {
 variable "druid_image_registry" {
   type        = string
   description = "Docker registry used to fetch the Apache Druid image"
-  default     = "spaghettifunk"
+  default     = "davideberdin"
 }
 
 variable "druid_image_repository" {
@@ -141,13 +141,13 @@ variable "create_zookeeper" {
 variable "zookeeper_namespace" {
   type        = string
   description = "namespace where to deploy the zookeeper resource"
-  default     = "druid"
+  default     = "zk-druid"
 }
 
 variable "zookeeper_host" {
   type        = string
   description = "Zookeeper hostname for Druid"
-  default     = "zk-cs.druid.svc.cluster.local"
+  default     = "zk-cs.zk-druid.svc.cluster.local"
 }
 
 variable "zookeeper_replicas" {
@@ -166,7 +166,7 @@ variable "create_postgres" {
 variable "postgres_namespace" {
   type        = string
   description = "namespace where to deploy the postgres resource"
-  default     = "druid"
+  default     = "postgres-druid"
 }
 
 variable "postgres_db" {
@@ -178,7 +178,7 @@ variable "postgres_db" {
 variable "postgres_host" {
   type        = string
   description = "Postgress Database hostname for Druid"
-  default     = "postgres-cs.druid.svc.cluster.local"
+  default     = "postgres-cs.postgres-druid.svc.cluster.local"
 }
 
 variable "postgres_port" {
