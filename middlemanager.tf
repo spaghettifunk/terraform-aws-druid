@@ -44,8 +44,6 @@ resource "kubernetes_service" "mm_cs" {
   }
 }
 
-
-
 resource "kubernetes_deployment" "middlemanager" {
   metadata {
     name      = "middlemanager"
@@ -87,7 +85,7 @@ resource "kubernetes_deployment" "middlemanager" {
 
         container {
           name  = "middlemanager"
-          image = "$${druid_image}:$${druid_tag}"
+          image = local.druid_image
 
           port {
             name           = "middlemanager"
@@ -96,18 +94,8 @@ resource "kubernetes_deployment" "middlemanager" {
 
           env_from {
             config_map_ref {
-              name = "postgres-config"
+              name = "druid-common-config"
             }
-          }
-
-          env {
-            name  = "POSTGRES_URL"
-            value = "postgres-cs.$${namespace}.svc.cluster.local"
-          }
-
-          env {
-            name  = "ZOOKEEPER_SERVER"
-            value = "zk-cs.$${namespace}.svc.cluster.local"
           }
 
           env {
@@ -117,7 +105,6 @@ resource "kubernetes_deployment" "middlemanager" {
 
           env {
             name = "DRUID_HOST"
-
             value_from {
               field_ref {
                 field_path = "status.podIP"
@@ -135,11 +122,6 @@ resource "kubernetes_deployment" "middlemanager" {
             value = "-server -Xms4G -Xmx4G -XX:MaxDirectMemorySize=12G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
           }
 
-          env {
-            name  = "JVM_PEONS_ARGS"
-            value = "-Daws.region=eu-west-1"
-          }
-
           env_from {
             secret_ref {
               name = "druid-secret"
@@ -150,11 +132,6 @@ resource "kubernetes_deployment" "middlemanager" {
             limits {
               cpu    = "512m"
               memory = "8Gi"
-            }
-
-            requests {
-              cpu    = "256m"
-              memory = "4Gi"
             }
           }
 
@@ -195,4 +172,3 @@ resource "kubernetes_deployment" "middlemanager" {
     }
   }
 }
-

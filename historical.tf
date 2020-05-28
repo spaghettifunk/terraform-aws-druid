@@ -44,8 +44,6 @@ resource "kubernetes_service" "historical_cs" {
   }
 }
 
-
-
 resource "kubernetes_deployment" "historical" {
   metadata {
     name      = "historical"
@@ -87,7 +85,7 @@ resource "kubernetes_deployment" "historical" {
 
         container {
           name  = "historical"
-          image = "$${druid_image}:$${druid_tag}"
+          image = local.druid_image
 
           port {
             name           = "historical"
@@ -96,18 +94,14 @@ resource "kubernetes_deployment" "historical" {
 
           env_from {
             config_map_ref {
-              name = "postgres-config"
+              name = "druid-common-config"
             }
           }
 
-          env {
-            name  = "POSTGRES_URL"
-            value = "postgres-cs.$${namespace}.svc.cluster.local"
-          }
-
-          env {
-            name  = "ZOOKEEPER_SERVER"
-            value = "zk-cs.$${namespace}.svc.cluster.local"
+          env_from {
+            secret_ref {
+              name = "druid-secret"
+            }
           }
 
           env {
@@ -117,7 +111,6 @@ resource "kubernetes_deployment" "historical" {
 
           env {
             name = "DRUID_HOST"
-
             value_from {
               field_ref {
                 field_path = "status.podIP"
@@ -135,21 +128,10 @@ resource "kubernetes_deployment" "historical" {
             value = "-server -Xms4G -Xmx4G -XX:MaxDirectMemorySize=12G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -XX:NewSize=4G -XX:MaxNewSize=4G -XX:+UseConcMarkSweepGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
           }
 
-          env_from {
-            secret_ref {
-              name = "druid-secret"
-            }
-          }
-
           resources {
             limits {
               cpu    = "512m"
               memory = "8Gi"
-            }
-
-            requests {
-              cpu    = "256m"
-              memory = "4Gi"
             }
           }
 
@@ -190,4 +172,3 @@ resource "kubernetes_deployment" "historical" {
     }
   }
 }
-

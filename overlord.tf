@@ -73,7 +73,6 @@ resource "kubernetes_deployment" "overlord" {
       spec {
         volume {
           name = "druid-secret"
-
           secret {
             secret_name = "druid-secret"
           }
@@ -85,7 +84,7 @@ resource "kubernetes_deployment" "overlord" {
 
         container {
           name  = "overlord"
-          image = "$${druid_image}:$${druid_tag}"
+          image = local.druid_image
 
           port {
             name           = "overlord"
@@ -94,18 +93,8 @@ resource "kubernetes_deployment" "overlord" {
 
           env_from {
             config_map_ref {
-              name = "postgres-config"
+              name = "druid-common-config"
             }
-          }
-
-          env {
-            name  = "POSTGRES_URL"
-            value = "postgres-cs.$${namespace}.svc.cluster.local"
-          }
-
-          env {
-            name  = "ZOOKEEPER_SERVER"
-            value = "zk-cs.$${namespace}.svc.cluster.local"
           }
 
           env {
@@ -115,7 +104,6 @@ resource "kubernetes_deployment" "overlord" {
 
           env {
             name = "DRUID_HOST"
-
             value_from {
               field_ref {
                 field_path = "status.podIP"
@@ -142,11 +130,6 @@ resource "kubernetes_deployment" "overlord" {
           resources {
             limits {
               cpu    = "512m"
-              memory = "2Gi"
-            }
-
-            requests {
-              cpu    = "256m"
               memory = "2Gi"
             }
           }
@@ -188,4 +171,3 @@ resource "kubernetes_deployment" "overlord" {
     }
   }
 }
-

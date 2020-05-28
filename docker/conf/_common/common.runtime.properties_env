@@ -14,7 +14,7 @@ druid.startup.logging.logProperties=true
 
 # For PostgreSQL (make sure to additionally include the Postgres extension):
 druid.metadata.storage.type=postgresql
-druid.metadata.storage.connector.connectURI=jdbc:postgresql://${POSTGRES_URL}:5432/druid
+druid.metadata.storage.connector.connectURI=jdbc:postgresql://${POSTGRES_URL}:${POSTGRES_PORT}/${POSTGRES_DB}
 druid.metadata.storage.connector.user=${POSTGRES_USER}
 druid.metadata.storage.connector.password=${POSTGRES_PASSWORD}
 
@@ -29,15 +29,12 @@ druid.indexer.logs.s3Prefix=indexing-logs
 
 # Monitoring
 druid.monitoring.monitors=["org.apache.druid.java.util.metrics.JvmMonitor"]
-druid.emitter=logging
-druid.emitter.logging.logLevel=debug
 
 # Deep Storage
 druid.storage.type=s3
 druid.storage.bucket=${BUCKET_STORAGE}
 druid.storage.baseKey=segments
 druid.storage.useS3aSchema=True
-
 
 # Security
 druid.server.hiddenProperties=["druid.s3.accessKey","druid.s3.secretKey","druid.metadata.storage.connector.password"]

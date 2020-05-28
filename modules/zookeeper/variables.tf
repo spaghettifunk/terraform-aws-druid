@@ -1,3 +1,9 @@
+variable "enable" {
+  type        = bool
+  description = "enable the creation of this resource"
+  default     = true
+}
+
 variable "namespace" {
   type        = string
   description = "zookeeper namespace where the resource will be installed"

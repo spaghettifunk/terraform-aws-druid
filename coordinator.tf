@@ -44,8 +44,6 @@ resource "kubernetes_service" "coordinator_cs" {
   }
 }
 
-
-
 resource "kubernetes_deployment" "coordinator" {
   metadata {
     name      = "coordinator"
@@ -73,21 +71,9 @@ resource "kubernetes_deployment" "coordinator" {
       }
 
       spec {
-        volume {
-          name = "druid-secret"
-
-          secret {
-            secret_name = "druid-secret"
-          }
-        }
-
-        volume {
-          name = "data"
-        }
-
         container {
           name  = "coordinator"
-          image = "$${druid_image}:$${druid_tag}"
+          image = local.druid_image
 
           port {
             name           = "coordinator"
@@ -96,18 +82,8 @@ resource "kubernetes_deployment" "coordinator" {
 
           env_from {
             config_map_ref {
-              name = "postgres-config"
+              name = "druid-common-config"
             }
-          }
-
-          env {
-            name  = "POSTGRES_URL"
-            value = "postgres-cs.$${namespace}.svc.cluster.local"
-          }
-
-          env {
-            name  = "ZOOKEEPER_SERVER"
-            value = "zk-cs.$${namespace}.svc.cluster.local"
           }
 
           env {
@@ -117,7 +93,6 @@ resource "kubernetes_deployment" "coordinator" {
 
           env {
             name = "DRUID_HOST"
-
             value_from {
               field_ref {
                 field_path = "status.podIP"
@@ -143,11 +118,6 @@ resource "kubernetes_deployment" "coordinator" {
 
           resources {
             limits {
-              cpu    = "256m"
-              memory = "2Gi"
-            }
-
-            requests {
               cpu    = "256m"
               memory = "2Gi"
             }
@@ -185,9 +155,19 @@ resource "kubernetes_deployment" "coordinator" {
           }
         }
 
+        volume {
+          name = "druid-secret"
+          secret {
+            secret_name = "druid-secret"
+          }
+        }
+
+        volume {
+          name = "data"
+        }
+
         termination_grace_period_seconds = 1800
       }
     }
   }
 }
-

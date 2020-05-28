@@ -44,7 +44,7 @@ variable "historical_replicas" {
 variable "middlemanager_replicas" {
   type        = number
   description = "Number of replicas for the Middlemanager service"
-  default     = 2
+  default     = 1
 }
 
 variable "overlord_replicas" {
@@ -66,6 +66,18 @@ variable "create_zookeeper" {
   default     = true
 }
 
+variable "zookeeper_namespace" {
+  type        = string
+  description = "namespace where to deploy the zookeeper resource"
+  default     = "druid"
+}
+
+variable "zookeeper_host" {
+  type        = string
+  description = "Zookeeper hostname for Druid"
+  default     = "zk-cs.druid.svc.cluster.local"
+}
+
 variable "zookeeper_replicas" {
   type        = number
   description = "Number of replicas for the Zookeeper service"
@@ -79,11 +91,28 @@ variable "create_postgres" {
   default     = true
 }
 
-// Postgres variables
+variable "postgres_namespace" {
+  type        = string
+  description = "namespace where to deploy the postgres resource"
+  default     = "druid"
+}
+
 variable "postgres_db" {
   type        = string
   description = "Postgress Database name for Druid"
   default     = "druid"
+}
+
+variable "postgres_host" {
+  type        = string
+  description = "Postgress Database hostname for Druid"
+  default     = "postgres-cs.druid.svc.cluster.local"
+}
+
+variable "postgres_port" {
+  type        = string
+  description = "Postgress Database port for Druid"
+  default     = "5432"
 }
 
 variable "postgres_user" {

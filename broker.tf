@@ -1,5 +1,4 @@
 resource "kubernetes_service" "broker_hs" {
-
   metadata {
     name      = "broker-hs"
     namespace = var.namespace
@@ -71,18 +70,6 @@ resource "kubernetes_deployment" "broker" {
       }
 
       spec {
-        volume {
-          name = "druid-secret"
-
-          secret {
-            secret_name = "druid-secret"
-          }
-        }
-
-        volume {
-          name = "data"
-        }
-
         container {
           name  = "broker"
           image = local.druid_image
@@ -94,18 +81,14 @@ resource "kubernetes_deployment" "broker" {
 
           env_from {
             config_map_ref {
-              name = "postgres-config"
+              name = "druid-common-config"
             }
           }
 
-          env {
-            name  = "POSTGRES_URL"
-            value = "postgres-cs.$${namespace}.svc.cluster.local"
-          }
-
-          env {
-            name  = "ZOOKEEPER_SERVER"
-            value = "zk-cs.$${namespace}.svc.cluster.local"
+          env_from {
+            secret_ref {
+              name = "druid-secret"
+            }
           }
 
           env {
@@ -115,7 +98,6 @@ resource "kubernetes_deployment" "broker" {
 
           env {
             name = "DRUID_HOST"
-
             value_from {
               field_ref {
                 field_path = "status.podIP"
@@ -133,21 +115,10 @@ resource "kubernetes_deployment" "broker" {
             value = "-server -Xms4G -Xmx4G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -XX:NewSize=4G -XX:MaxNewSize=4G -XX:MaxDirectMemorySize=12G -XX:+UseG1GC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
           }
 
-          env_from {
-            secret_ref {
-              name = "druid-secret"
-            }
-          }
-
           resources {
             limits {
               memory = "8Gi"
               cpu    = "512m"
-            }
-
-            requests {
-              cpu    = "512m"
-              memory = "4Gi"
             }
           }
 
@@ -183,9 +154,20 @@ resource "kubernetes_deployment" "broker" {
           }
         }
 
+        volume {
+          name = "druid-secret"
+
+          secret {
+            secret_name = "druid-secret"
+          }
+        }
+
+        volume {
+          name = "data"
+        }
+
         termination_grace_period_seconds = 1800
       }
     }
   }
 }
-

@@ -1,10 +1,14 @@
 resource "kubernetes_namespace" "zookeeper_druid" {
+  count = var.enable ? 1 : 0
+
   metadata {
     name = var.namespace
   }
 }
 
 resource "kubernetes_service" "zk_hs" {
+  count = var.enable ? 1 : 0
+
   metadata {
     name      = "zk-hs"
     namespace = kubernetes_namespace.zookeeper_druid
@@ -34,6 +38,8 @@ resource "kubernetes_service" "zk_hs" {
 }
 
 resource "kubernetes_service" "zk_cs" {
+  count = var.enable ? 1 : 0
+
   metadata {
     name      = "zk-cs"
     namespace = kubernetes_namespace.zookeeper_druid
@@ -56,6 +62,8 @@ resource "kubernetes_service" "zk_cs" {
 }
 
 resource "kubernetes_pod_disruption_budget" "zk_pdb" {
+  count = var.enable ? 1 : 0
+
   metadata {
     name      = "zk-pdb"
     namespace = kubernetes_namespace.zookeeper_druid
@@ -73,6 +81,8 @@ resource "kubernetes_pod_disruption_budget" "zk_pdb" {
 }
 
 resource "kubernetes_stateful_set" "zk" {
+  count = var.enable ? 1 : 0
+
   depends_on = [
     kubernetes_service.zk_hs,
     kubernetes_service.zk_cs,

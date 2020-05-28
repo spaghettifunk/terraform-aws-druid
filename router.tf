@@ -73,7 +73,6 @@ resource "kubernetes_deployment" "router" {
       spec {
         volume {
           name = "druid-secret"
-
           secret {
             secret_name = "druid-secret"
           }
@@ -85,7 +84,7 @@ resource "kubernetes_deployment" "router" {
 
         container {
           name  = "router"
-          image = "$${druid_image}:$${druid_tag}"
+          image = local.druid_image
 
           port {
             name           = "router"
@@ -94,18 +93,14 @@ resource "kubernetes_deployment" "router" {
 
           env_from {
             config_map_ref {
-              name = "postgres-config"
+              name = "druid-common-config"
             }
           }
 
-          env {
-            name  = "POSTGRES_URL"
-            value = "postgres-cs.$${namespace}.svc.cluster.local"
-          }
-
-          env {
-            name  = "ZOOKEEPER_SERVER"
-            value = "zk-cs.$${namespace}.svc.cluster.local"
+          env_from {
+            secret_ref {
+              name = "druid-secret"
+            }
           }
 
           env {
@@ -115,7 +110,6 @@ resource "kubernetes_deployment" "router" {
 
           env {
             name = "DRUID_HOST"
-
             value_from {
               field_ref {
                 field_path = "status.podIP"
@@ -133,21 +127,10 @@ resource "kubernetes_deployment" "router" {
             value = "-server -Xms256m -Xmx256m -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
           }
 
-          env_from {
-            secret_ref {
-              name = "druid-secret"
-            }
-          }
-
           resources {
             limits {
               memory = "512Mi"
               cpu    = "128m"
-            }
-
-            requests {
-              cpu    = "128m"
-              memory = "256Mi"
             }
           }
 
@@ -188,4 +171,3 @@ resource "kubernetes_deployment" "router" {
     }
   }
 }
-
