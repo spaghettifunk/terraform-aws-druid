@@ -1,83 +1,83 @@
-resource "kubernetes_service" "historical_hs" {
+resource "kubernetes_service" "router_hs" {
   metadata {
-    name      = "historical-hs"
+    name      = "router-hs"
     namespace = var.namespace
 
     labels = {
-      app = "historical"
+      app = "router"
     }
   }
 
   spec {
     port {
-      name = "historical"
-      port = 8083
+      name = "router"
+      port = 8888
     }
 
     selector = {
-      app = "historical"
+      app = "router"
     }
 
     cluster_ip = "None"
   }
 }
 
-resource "kubernetes_service" "historical_cs" {
+resource "kubernetes_service" "router_cs" {
   metadata {
-    name      = "historical-cs"
+    name      = "router-cs"
     namespace = var.namespace
 
     labels = {
-      app = "historical"
+      app = "router"
     }
   }
 
   spec {
     port {
-      name = "historical"
-      port = 8083
+      name = "router"
+      port = 8888
     }
 
     selector = {
-      app = "historical"
+      app = "router"
     }
   }
 }
 
-resource "kubernetes_deployment" "historical" {
+resource "kubernetes_deployment" "router" {
   metadata {
-    name      = "historical"
+    name      = "router"
     namespace = var.namespace
 
     labels = {
-      app = "historical"
+      app = "router"
     }
   }
 
   spec {
-    replicas = var.historical_replicas
+    replicas = var.router_replicas
 
     selector {
       match_labels = {
-        app = "historical"
+        app = "router"
       }
     }
 
     template {
       metadata {
         labels = {
-          app = "historical"
+          app = "router"
         }
       }
 
       spec {
         container {
-          name  = "historical"
-          image = local.druid_image
+          name  = "router"
+          image = var.druid_image
 
           port {
-            name           = "historical"
-            container_port = 8083
+            name           = "router"
+            container_port = 8888
           }
 
           env_from {
@@ -94,7 +94,7 @@ resource "kubernetes_deployment" "historical" {
 
           env {
             name  = "DRUID_SERVICE_PORT"
-            value = "8083"
+            value = "8888"
           }
 
           env {
@@ -108,18 +108,18 @@ resource "kubernetes_deployment" "historical" {
 
           env {
             name  = "DRUID_SERVICE"
-            value = "historical"
+            value = "router"
           }
 
           env {
             name  = "DRUID_JVM_ARGS"
-            value = "-server -Xms4G -Xmx4G -XX:MaxDirectMemorySize=12G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -XX:NewSize=4G -XX:MaxNewSize=4G -XX:+UseConcMarkSweepGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
+            value = "-server -Xms256m -Xmx256m -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
           }
 
           resources {
             limits {
-              cpu    = "512m"
-              memory = "8Gi"
+              memory = "512Mi"
+              cpu    = "128m"
             }
           }
 
@@ -131,7 +131,7 @@ resource "kubernetes_deployment" "historical" {
           liveness_probe {
             http_get {
               path = "/status/health"
-              port = "8083"
+              port = "8888"
             }
 
             initial_delay_seconds = 60
@@ -140,7 +140,7 @@ resource "kubernetes_deployment" "historical" {
           readiness_probe {
             http_get {
               path = "/status/health"
-              port = "8083"
+              port = "8888"
             }
 
             initial_delay_seconds = 60
@@ -157,7 +157,6 @@ resource "kubernetes_deployment" "historical" {
 
         volume {
           name = "druid-secret"
-
           secret {
             secret_name = "druid-secret"
           }
@@ -168,7 +167,7 @@ resource "kubernetes_deployment" "historical" {
         }
 
         dynamic "toleration" {
-          for_each = [for t in var.tolerations_historical : {
+          for_each = [for t in var.tolerations_router : {
             effect             = t.effect
             key                = t.key
             operator           = t.operator
@@ -182,34 +181,6 @@ resource "kubernetes_deployment" "historical" {
             operator           = toleration.value.operator
             toleration_seconds = toleration.value.toleration_seconds
             value              = toleration.value.value
-          }
-        }
-
-        affinity {
-          pod_anti_affinity {
-            required_during_scheduling_ignored_during_execution {
-              label_selector {
-                match_expressions {
-                  key      = "app"
-                  operator = "In"
-                  values   = ["historical"]
-                }
-              }
-              topology_key = "kubernetes.io/hostname"
-            }
-          }
-
-          pod_affinity {
-            required_during_scheduling_ignored_during_execution {
-              label_selector {
-                match_expressions {
-                  key      = "app"
-                  operator = "In"
-                  values   = ["middlemanager"]
-                }
-              }
-              topology_key = "kubernetes.io/hostname"
-            }
           }
         }
 

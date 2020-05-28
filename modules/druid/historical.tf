@@ -1,83 +1,83 @@
-resource "kubernetes_service" "coordinator_hs" {
+resource "kubernetes_service" "historical_hs" {
   metadata {
-    name      = "coordinator-hs"
+    name      = "historical-hs"
     namespace = var.namespace
 
     labels = {
-      app = "coordinator"
+      app = "historical"
     }
   }
 
   spec {
     port {
-      name = "coordinator"
-      port = 8081
+      name = "historical"
+      port = 8083
     }
 
     selector = {
-      app = "coordinator"
+      app = "historical"
     }
 
     cluster_ip = "None"
   }
 }
 
-resource "kubernetes_service" "coordinator_cs" {
+resource "kubernetes_service" "historical_cs" {
   metadata {
-    name      = "coordinator-cs"
+    name      = "historical-cs"
     namespace = var.namespace
 
     labels = {
-      app = "coordinator"
+      app = "historical"
     }
   }
 
   spec {
     port {
-      name = "coordinator"
-      port = 8081
+      name = "historical"
+      port = 8083
     }
 
     selector = {
-      app = "coordinator"
+      app = "historical"
     }
   }
 }
 
-resource "kubernetes_deployment" "coordinator" {
+resource "kubernetes_deployment" "historical" {
   metadata {
-    name      = "coordinator"
+    name      = "historical"
     namespace = var.namespace
 
     labels = {
-      app = "coordinator"
+      app = "historical"
     }
   }
 
   spec {
-    replicas = var.coordinator_replicas
+    replicas = var.historical_replicas
 
     selector {
       match_labels = {
-        app = "coordinator"
+        app = "historical"
       }
     }
 
     template {
       metadata {
         labels = {
-          app = "coordinator"
+          app = "historical"
         }
       }
 
       spec {
         container {
-          name  = "coordinator"
-          image = local.druid_image
+          name  = "historical"
+          image = var.druid_image
 
           port {
-            name           = "coordinator"
-            container_port = 8081
+            name           = "historical"
+            container_port = 8083
           }
 
           env_from {
@@ -86,9 +86,15 @@ resource "kubernetes_deployment" "coordinator" {
             }
           }
 
+          env_from {
+            secret_ref {
+              name = "druid-secret"
+            }
+          }
+
           env {
             name  = "DRUID_SERVICE_PORT"
-            value = "8081"
+            value = "8083"
           }
 
           env {
@@ -102,24 +108,18 @@ resource "kubernetes_deployment" "coordinator" {
 
           env {
             name  = "DRUID_SERVICE"
-            value = "coordinator"
+            value = "historical"
           }
 
           env {
             name  = "DRUID_JVM_ARGS"
-            value = "-server -Xms1G -Xmx1G -XX:MaxDirectMemorySize=2G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -Dderby.stream.error.file=var/druid/derby.log"
-          }
-
-          env_from {
-            secret_ref {
-              name = "druid-secret"
-            }
+            value = "-server -Xms4G -Xmx4G -XX:MaxDirectMemorySize=12G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -XX:NewSize=4G -XX:MaxNewSize=4G -XX:+UseConcMarkSweepGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
           }
 
           resources {
             limits {
-              cpu    = "256m"
-              memory = "2Gi"
+              cpu    = "512m"
+              memory = "8Gi"
             }
           }
 
@@ -131,7 +131,7 @@ resource "kubernetes_deployment" "coordinator" {
           liveness_probe {
             http_get {
               path = "/status/health"
-              port = "8081"
+              port = "8083"
             }
 
             initial_delay_seconds = 60
@@ -140,7 +140,7 @@ resource "kubernetes_deployment" "coordinator" {
           readiness_probe {
             http_get {
               path = "/status/health"
-              port = "8081"
+              port = "8083"
             }
 
             initial_delay_seconds = 60
@@ -157,6 +157,7 @@ resource "kubernetes_deployment" "coordinator" {
 
         volume {
           name = "druid-secret"
+
           secret {
             secret_name = "druid-secret"
           }
@@ -167,7 +168,7 @@ resource "kubernetes_deployment" "coordinator" {
         }
 
         dynamic "toleration" {
-          for_each = [for t in var.tolerations_coordinator : {
+          for_each = [for t in var.tolerations_historical : {
             effect             = t.effect
             key                = t.key
             operator           = t.operator
@@ -191,7 +192,7 @@ resource "kubernetes_deployment" "coordinator" {
                 match_expressions {
                   key      = "app"
                   operator = "In"
-                  values   = ["coordinator"]
+                  values   = ["historical"]
                 }
               }
               topology_key = "kubernetes.io/hostname"
@@ -204,7 +205,7 @@ resource "kubernetes_deployment" "coordinator" {
                 match_expressions {
                   key      = "app"
                   operator = "In"
-                  values   = ["overlord"]
+                  values   = ["middlemanager"]
                 }
               }
               topology_key = "kubernetes.io/hostname"
@@ -217,24 +218,3 @@ resource "kubernetes_deployment" "coordinator" {
     }
   }
 }
-
-
-# affinity:
-#   podAntiAffinity:
-#     requiredDuringSchedulingIgnoredDuringExecution:
-#     - labelSelector:
-#         matchExpressions:
-#         - key: app
-#           operator: In
-#           values:
-#           - web-store
-#       topologyKey: "kubernetes.io/hostname"
-#   podAffinity:
-#     requiredDuringSchedulingIgnoredDuringExecution:
-#     - labelSelector:
-#         matchExpressions:
-#         - key: app
-#           operator: In
-#           values:
-#           - store
-#       topologyKey: "kubernetes.io/hostname"

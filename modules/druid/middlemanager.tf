@@ -73,7 +73,7 @@ resource "kubernetes_deployment" "middlemanager" {
       spec {
         container {
           name  = "middlemanager"
-          image = local.druid_image
+          image = var.druid_image
 
           port {
             name           = "middlemanager"

@@ -1,83 +1,83 @@
-resource "kubernetes_service" "router_hs" {
+resource "kubernetes_service" "overlord_hs" {
   metadata {
-    name      = "router-hs"
+    name      = "overlord-hs"
     namespace = var.namespace
 
     labels = {
-      app = "router"
+      app = "overlord"
     }
   }
 
   spec {
     port {
-      name = "router"
-      port = 8888
+      name = "overlord"
+      port = 8090
     }
 
     selector = {
-      app = "router"
+      app = "overlord"
     }
 
     cluster_ip = "None"
   }
 }
 
-resource "kubernetes_service" "router_cs" {
+resource "kubernetes_service" "overlord_cs" {
   metadata {
-    name      = "router-cs"
+    name      = "overlord-cs"
     namespace = var.namespace
 
     labels = {
-      app = "router"
+      app = "overlord"
     }
   }
 
   spec {
     port {
-      name = "router"
-      port = 8888
+      name = "overlord"
+      port = 8090
     }
 
     selector = {
-      app = "router"
+      app = "overlord"
     }
   }
 }
 
-resource "kubernetes_deployment" "router" {
+resource "kubernetes_deployment" "overlord" {
   metadata {
-    name      = "router"
+    name      = "overlord"
     namespace = var.namespace
 
     labels = {
-      app = "router"
+      app = "overlord"
     }
   }
 
   spec {
-    replicas = var.router_replicas
+    replicas = var.overlord_replicas
 
     selector {
       match_labels = {
-        app = "router"
+        app = "overlord"
       }
     }
 
     template {
       metadata {
         labels = {
-          app = "router"
+          app = "overlord"
         }
       }
 
       spec {
         container {
-          name  = "router"
-          image = local.druid_image
+          name  = "overlord"
+          image = var.druid_image
 
           port {
-            name           = "router"
-            container_port = 8888
+            name           = "overlord"
+            container_port = 8090
           }
 
           env_from {
@@ -86,15 +86,9 @@ resource "kubernetes_deployment" "router" {
             }
           }
 
-          env_from {
-            secret_ref {
-              name = "druid-secret"
-            }
-          }
-
           env {
             name  = "DRUID_SERVICE_PORT"
-            value = "8888"
+            value = "8090"
           }
 
           env {
@@ -108,18 +102,24 @@ resource "kubernetes_deployment" "router" {
 
           env {
             name  = "DRUID_SERVICE"
-            value = "router"
+            value = "overlord"
           }
 
           env {
             name  = "DRUID_JVM_ARGS"
-            value = "-server -Xms256m -Xmx256m -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
+            value = "-server -Xms1G -Xmx1G -XX:MaxDirectMemorySize=2G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
+          }
+
+          env_from {
+            secret_ref {
+              name = "druid-secret"
+            }
           }
 
           resources {
             limits {
-              memory = "512Mi"
-              cpu    = "128m"
+              cpu    = "512m"
+              memory = "2Gi"
             }
           }
 
@@ -131,7 +131,7 @@ resource "kubernetes_deployment" "router" {
           liveness_probe {
             http_get {
               path = "/status/health"
-              port = "8888"
+              port = "8090"
             }
 
             initial_delay_seconds = 60
@@ -140,7 +140,7 @@ resource "kubernetes_deployment" "router" {
           readiness_probe {
             http_get {
               path = "/status/health"
-              port = "8888"
+              port = "8090"
             }
 
             initial_delay_seconds = 60
@@ -167,7 +167,7 @@ resource "kubernetes_deployment" "router" {
         }
 
         dynamic "toleration" {
-          for_each = [for t in var.tolerations_router : {
+          for_each = [for t in var.tolerations_overlord : {
             effect             = t.effect
             key                = t.key
             operator           = t.operator
@@ -181,6 +181,34 @@ resource "kubernetes_deployment" "router" {
             operator           = toleration.value.operator
             toleration_seconds = toleration.value.toleration_seconds
             value              = toleration.value.value
+          }
+        }
+
+        affinity {
+          pod_anti_affinity {
+            required_during_scheduling_ignored_during_execution {
+              label_selector {
+                match_expressions {
+                  key      = "app"
+                  operator = "In"
+                  values   = ["overlord"]
+                }
+              }
+              topology_key = "kubernetes.io/hostname"
+            }
+          }
+
+          pod_affinity {
+            required_during_scheduling_ignored_during_execution {
+              label_selector {
+                match_expressions {
+                  key      = "app"
+                  operator = "In"
+                  values   = ["coordinator"]
+                }
+              }
+              topology_key = "kubernetes.io/hostname"
+            }
           }
         }
 

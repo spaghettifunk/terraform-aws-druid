@@ -72,7 +72,7 @@ resource "kubernetes_deployment" "broker" {
       spec {
         container {
           name  = "broker"
-          image = local.druid_image
+          image = var.druid_image
 
           port {
             name           = "broker"

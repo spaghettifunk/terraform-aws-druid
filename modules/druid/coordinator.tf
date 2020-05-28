@@ -1,83 +1,83 @@
-resource "kubernetes_service" "overlord_hs" {
+resource "kubernetes_service" "coordinator_hs" {
   metadata {
-    name      = "overlord-hs"
+    name      = "coordinator-hs"
     namespace = var.namespace
 
     labels = {
-      app = "overlord"
+      app = "coordinator"
     }
   }
 
   spec {
     port {
-      name = "overlord"
-      port = 8090
+      name = "coordinator"
+      port = 8081
     }
 
     selector = {
-      app = "overlord"
+      app = "coordinator"
     }
 
     cluster_ip = "None"
   }
 }
 
-resource "kubernetes_service" "overlord_cs" {
+resource "kubernetes_service" "coordinator_cs" {
   metadata {
-    name      = "overlord-cs"
+    name      = "coordinator-cs"
     namespace = var.namespace
 
     labels = {
-      app = "overlord"
+      app = "coordinator"
     }
   }
 
   spec {
     port {
-      name = "overlord"
-      port = 8090
+      name = "coordinator"
+      port = 8081
     }
 
     selector = {
-      app = "overlord"
+      app = "coordinator"
     }
   }
 }
 
-resource "kubernetes_deployment" "overlord" {
+resource "kubernetes_deployment" "coordinator" {
   metadata {
-    name      = "overlord"
+    name      = "coordinator"
     namespace = var.namespace
 
     labels = {
-      app = "overlord"
+      app = "coordinator"
     }
   }
 
   spec {
-    replicas = var.overlord_replicas
+    replicas = var.coordinator_replicas
 
     selector {
       match_labels = {
-        app = "overlord"
+        app = "coordinator"
       }
     }
 
     template {
       metadata {
         labels = {
-          app = "overlord"
+          app = "coordinator"
         }
       }
 
       spec {
         container {
-          name  = "overlord"
-          image = local.druid_image
+          name  = "coordinator"
+          image = var.druid_image
 
           port {
-            name           = "overlord"
-            container_port = 8090
+            name           = "coordinator"
+            container_port = 8081
           }
 
           env_from {
@@ -88,7 +88,7 @@ resource "kubernetes_deployment" "overlord" {
 
           env {
             name  = "DRUID_SERVICE_PORT"
-            value = "8090"
+            value = "8081"
           }
 
           env {
@@ -102,12 +102,12 @@ resource "kubernetes_deployment" "overlord" {
 
           env {
             name  = "DRUID_SERVICE"
-            value = "overlord"
+            value = "coordinator"
           }
 
           env {
             name  = "DRUID_JVM_ARGS"
-            value = "-server -Xms1G -Xmx1G -XX:MaxDirectMemorySize=2G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
+            value = "-server -Xms1G -Xmx1G -XX:MaxDirectMemorySize=2G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -Dderby.stream.error.file=var/druid/derby.log"
           }
 
           env_from {
@@ -118,7 +118,7 @@ resource "kubernetes_deployment" "overlord" {
 
           resources {
             limits {
-              cpu    = "512m"
+              cpu    = "256m"
               memory = "2Gi"
             }
           }
@@ -131,7 +131,7 @@ resource "kubernetes_deployment" "overlord" {
           liveness_probe {
             http_get {
               path = "/status/health"
-              port = "8090"
+              port = "8081"
             }
 
             initial_delay_seconds = 60
@@ -140,7 +140,7 @@ resource "kubernetes_deployment" "overlord" {
           readiness_probe {
             http_get {
               path = "/status/health"
-              port = "8090"
+              port = "8081"
             }
 
             initial_delay_seconds = 60
@@ -167,7 +167,7 @@ resource "kubernetes_deployment" "overlord" {
         }
 
         dynamic "toleration" {
-          for_each = [for t in var.tolerations_overlord : {
+          for_each = [for t in var.tolerations_coordinator : {
             effect             = t.effect
             key                = t.key
             operator           = t.operator
@@ -191,7 +191,7 @@ resource "kubernetes_deployment" "overlord" {
                 match_expressions {
                   key      = "app"
                   operator = "In"
-                  values   = ["overlord"]
+                  values   = ["coordinator"]
                 }
               }
               topology_key = "kubernetes.io/hostname"
@@ -204,7 +204,7 @@ resource "kubernetes_deployment" "overlord" {
                 match_expressions {
                   key      = "app"
                   operator = "In"
-                  values   = ["coordinator"]
+                  values   = ["overlord"]
                 }
               }
               topology_key = "kubernetes.io/hostname"
@@ -217,3 +217,24 @@ resource "kubernetes_deployment" "overlord" {
     }
   }
 }
+
+
+# affinity:
+#   podAntiAffinity:
+#     requiredDuringSchedulingIgnoredDuringExecution:
+#     - labelSelector:
+#         matchExpressions:
+#         - key: app
+#           operator: In
+#           values:
+#           - web-store
+#       topologyKey: "kubernetes.io/hostname"
+#   podAffinity:
+#     requiredDuringSchedulingIgnoredDuringExecution:
+#     - labelSelector:
+#         matchExpressions:
+#         - key: app
+#           operator: In
+#           values:
+#           - store
+#       topologyKey: "kubernetes.io/hostname"
