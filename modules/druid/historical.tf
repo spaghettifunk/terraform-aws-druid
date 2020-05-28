@@ -198,19 +198,6 @@ resource "kubernetes_deployment" "historical" {
               topology_key = "kubernetes.io/hostname"
             }
           }
-
-          pod_affinity {
-            required_during_scheduling_ignored_during_execution {
-              label_selector {
-                match_expressions {
-                  key      = "app"
-                  operator = "In"
-                  values   = ["middlemanager"]
-                }
-              }
-              topology_key = "kubernetes.io/hostname"
-            }
-          }
         }
 
         termination_grace_period_seconds = 1800

@@ -197,19 +197,6 @@ resource "kubernetes_deployment" "overlord" {
               topology_key = "kubernetes.io/hostname"
             }
           }
-
-          pod_affinity {
-            required_during_scheduling_ignored_during_execution {
-              label_selector {
-                match_expressions {
-                  key      = "app"
-                  operator = "In"
-                  values   = ["coordinator"]
-                }
-              }
-              topology_key = "kubernetes.io/hostname"
-            }
-          }
         }
 
         termination_grace_period_seconds = 1800
