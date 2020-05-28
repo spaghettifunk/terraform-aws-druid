@@ -24,6 +24,10 @@ It will take few minutes before it gets everything up and running. Once it's rea
 
 If you are able to see all the services in the Druid UI it means that your cluster is ready to be used.
 
+### Affinity and AntiAffinity
+
+In this module, we followed what the [production documentation](https://druid.apache.org/docs/latest/tutorials/cluster.html) explains. The location/colocation of the services are done by associating the nodes according to the `master`, `data` and `query` services.
+
 ## Postsgres
 
 If you want to deploy Postgres without using different values for Database name, user and password, mind that you need to keep the same `namespace` as the druid resources. Those values are defined in a configmap and you cannot share configmaps across namespaces.
