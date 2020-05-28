@@ -6,10 +6,10 @@ resource "kubernetes_config_map" "common_config" {
 
   data = {
     POSTGRES_URL      = local.postgres_url
-    POSTGRES_DB       = var.db_name
-    POSTGRES_PORT     = var.db_port
-    POSTGRES_PASSWORD = var.db_password
-    POSTGRES_USER     = var.db_username
+    POSTGRES_PORT     = var.postgres_port
+    POSTGRES_USER     = var.postgres_username
+    POSTGRES_PASSWORD = var.postgres_password
+    POSTGRES_DB       = var.postgres_db
     ZOOKEEPER_SERVER  = local.zookeeper_server
     JVM_PEONS_ARGS    = format("-Daws.region=%s", var.aws_region)
   }
