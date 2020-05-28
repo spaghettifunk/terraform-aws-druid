@@ -166,7 +166,7 @@ variable "create_postgres" {
 variable "postgres_namespace" {
   type        = string
   description = "namespace where to deploy the postgres resource"
-  default     = "postgres-druid"
+  default     = "druid"
 }
 
 variable "postgres_db" {
@@ -178,7 +178,7 @@ variable "postgres_db" {
 variable "postgres_host" {
   type        = string
   description = "Postgress Database hostname for Druid"
-  default     = "postgres-cs.postgres-druid.svc.cluster.local"
+  default     = "postgres-cs.druid.svc.cluster.local"
 }
 
 variable "postgres_port" {
