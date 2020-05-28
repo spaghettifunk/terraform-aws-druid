@@ -29,10 +29,34 @@ variable "broker_replicas" {
   default     = 1
 }
 
+variable "tolerations_broker" {
+  description = "toleration to apply to the deployment of the broker"
+  type = list(object({
+    effect             = string
+    key                = string
+    operator           = string
+    toleration_seconds = string
+    value              = string
+  }))
+  default = []
+}
+
 variable "coordinator_replicas" {
   type        = number
   description = "Number of replicas for the Coordinator service"
   default     = 1
+}
+
+variable "tolerations_coordinator" {
+  description = "toleration to apply to the deployment of the coordinator"
+  type = list(object({
+    effect             = string
+    key                = string
+    operator           = string
+    toleration_seconds = string
+    value              = string
+  }))
+  default = []
 }
 
 variable "historical_replicas" {
@@ -41,10 +65,34 @@ variable "historical_replicas" {
   default     = 1
 }
 
+variable "tolerations_historical" {
+  description = "toleration to apply to the deployment of the historical"
+  type = list(object({
+    effect             = string
+    key                = string
+    operator           = string
+    toleration_seconds = string
+    value              = string
+  }))
+  default = []
+}
+
 variable "middlemanager_replicas" {
   type        = number
   description = "Number of replicas for the Middlemanager service"
   default     = 1
+}
+
+variable "tolerations_middlemanager" {
+  description = "toleration to apply to the deployment of the middlemanager"
+  type = list(object({
+    effect             = string
+    key                = string
+    operator           = string
+    toleration_seconds = string
+    value              = string
+  }))
+  default = []
 }
 
 variable "overlord_replicas" {
@@ -53,10 +101,34 @@ variable "overlord_replicas" {
   default     = 1
 }
 
+variable "tolerations_overlord" {
+  description = "toleration to apply to the deployment of the overlord"
+  type = list(object({
+    effect             = string
+    key                = string
+    operator           = string
+    toleration_seconds = string
+    value              = string
+  }))
+  default = []
+}
+
 variable "router_replicas" {
   type        = number
   description = "Number of replicas for the Router service"
   default     = 1
+}
+
+variable "tolerations_router" {
+  description = "toleration to apply to the deployment of the router"
+  type = list(object({
+    effect             = string
+    key                = string
+    operator           = string
+    toleration_seconds = string
+    value              = string
+  }))
+  default = []
 }
 
 // Zookeeper variables

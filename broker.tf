@@ -154,6 +154,24 @@ resource "kubernetes_deployment" "broker" {
           }
         }
 
+        dynamic "toleration" {
+          for_each = [for t in var.tolerations_broker : {
+            effect             = t.effect
+            key                = t.key
+            operator           = t.operator
+            toleration_seconds = t.toleration_seconds
+            value              = t.value
+          }]
+
+          content {
+            effect             = toleration.value.effect
+            key                = toleration.value.key
+            operator           = toleration.value.operator
+            toleration_seconds = toleration.value.toleration_seconds
+            value              = toleration.value.value
+          }
+        }
+
         volume {
           name = "druid-secret"
 
@@ -164,6 +182,21 @@ resource "kubernetes_deployment" "broker" {
 
         volume {
           name = "data"
+        }
+
+        affinity {
+          pod_anti_affinity {
+            required_during_scheduling_ignored_during_execution {
+              label_selector {
+                match_expressions {
+                  key      = "app"
+                  operator = "In"
+                  values   = ["broker"]
+                }
+              }
+              topology_key = "kubernetes.io/hostname"
+            }
+          }
         }
 
         termination_grace_period_seconds = 1800

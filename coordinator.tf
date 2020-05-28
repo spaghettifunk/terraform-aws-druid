@@ -166,8 +166,75 @@ resource "kubernetes_deployment" "coordinator" {
           name = "data"
         }
 
+        dynamic "toleration" {
+          for_each = [for t in var.tolerations_coordinator : {
+            effect             = t.effect
+            key                = t.key
+            operator           = t.operator
+            toleration_seconds = t.toleration_seconds
+            value              = t.value
+          }]
+
+          content {
+            effect             = toleration.value.effect
+            key                = toleration.value.key
+            operator           = toleration.value.operator
+            toleration_seconds = toleration.value.toleration_seconds
+            value              = toleration.value.value
+          }
+        }
+
+        affinity {
+          pod_anti_affinity {
+            required_during_scheduling_ignored_during_execution {
+              label_selector {
+                match_expressions {
+                  key      = "app"
+                  operator = "In"
+                  values   = ["coordinator"]
+                }
+              }
+              topology_key = "kubernetes.io/hostname"
+            }
+          }
+
+          pod_affinity {
+            required_during_scheduling_ignored_during_execution {
+              label_selector {
+                match_expressions {
+                  key      = "app"
+                  operator = "In"
+                  values   = ["overlord"]
+                }
+              }
+              topology_key = "kubernetes.io/hostname"
+            }
+          }
+        }
+
         termination_grace_period_seconds = 1800
       }
     }
   }
 }
+
+
+# affinity:
+#   podAntiAffinity:
+#     requiredDuringSchedulingIgnoredDuringExecution:
+#     - labelSelector:
+#         matchExpressions:
+#         - key: app
+#           operator: In
+#           values:
+#           - web-store
+#       topologyKey: "kubernetes.io/hostname"
+#   podAffinity:
+#     requiredDuringSchedulingIgnoredDuringExecution:
+#     - labelSelector:
+#         matchExpressions:
+#         - key: app
+#           operator: In
+#           values:
+#           - store
+#       topologyKey: "kubernetes.io/hostname"

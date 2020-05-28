@@ -71,17 +71,6 @@ resource "kubernetes_deployment" "overlord" {
       }
 
       spec {
-        volume {
-          name = "druid-secret"
-          secret {
-            secret_name = "druid-secret"
-          }
-        }
-
-        volume {
-          name = "data"
-        }
-
         container {
           name  = "overlord"
           image = local.druid_image
@@ -162,6 +151,63 @@ resource "kubernetes_deployment" "overlord" {
           security_context {
             capabilities {
               add = ["IPC_LOCK"]
+            }
+          }
+        }
+
+        volume {
+          name = "druid-secret"
+          secret {
+            secret_name = "druid-secret"
+          }
+        }
+
+        volume {
+          name = "data"
+        }
+
+        dynamic "toleration" {
+          for_each = [for t in var.tolerations_overlord : {
+            effect             = t.effect
+            key                = t.key
+            operator           = t.operator
+            toleration_seconds = t.toleration_seconds
+            value              = t.value
+          }]
+
+          content {
+            effect             = toleration.value.effect
+            key                = toleration.value.key
+            operator           = toleration.value.operator
+            toleration_seconds = toleration.value.toleration_seconds
+            value              = toleration.value.value
+          }
+        }
+
+        affinity {
+          pod_anti_affinity {
+            required_during_scheduling_ignored_during_execution {
+              label_selector {
+                match_expressions {
+                  key      = "app"
+                  operator = "In"
+                  values   = ["overlord"]
+                }
+              }
+              topology_key = "kubernetes.io/hostname"
+            }
+          }
+
+          pod_affinity {
+            required_during_scheduling_ignored_during_execution {
+              label_selector {
+                match_expressions {
+                  key      = "app"
+                  operator = "In"
+                  values   = ["coordinator"]
+                }
+              }
+              topology_key = "kubernetes.io/hostname"
             }
           }
         }
