@@ -11,7 +11,7 @@ resource "kubernetes_service" "zk_hs" {
 
   metadata {
     name      = "zk-hs"
-    namespace = kubernetes_namespace.zookeeper_druid
+    namespace = kubernetes_namespace.zookeeper_druid.metadata.0.name
 
     labels = {
       app = "zk"
@@ -42,7 +42,7 @@ resource "kubernetes_service" "zk_cs" {
 
   metadata {
     name      = "zk-cs"
-    namespace = kubernetes_namespace.zookeeper_druid
+    namespace = kubernetes_namespace.zookeeper_druid.metadata.0.name
 
     labels = {
       app = "zk"
@@ -66,7 +66,7 @@ resource "kubernetes_pod_disruption_budget" "zk_pdb" {
 
   metadata {
     name      = "zk-pdb"
-    namespace = kubernetes_namespace.zookeeper_druid
+    namespace = kubernetes_namespace.zookeeper_druid.metadata.0.name
   }
 
   spec {
@@ -91,7 +91,7 @@ resource "kubernetes_stateful_set" "zk" {
 
   metadata {
     name      = "zk"
-    namespace = kubernetes_namespace.zookeeper_druid
+    namespace = kubernetes_namespace.zookeeper_druid.metadata.0.name
   }
 
   spec {
