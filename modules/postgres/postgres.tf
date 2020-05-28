@@ -1,27 +1,8 @@
-resource "kubernetes_namespace" "postgres_druid" {  
+resource "kubernetes_namespace" "postgres_druid" {
   count = var.enable ? 1 : 0
 
   metadata {
     name = var.namespace
-  }
-}
-
-resource "kubernetes_config_map" "postgres_config" {
-  count = var.enable ? 1 : 0
-
-  metadata {
-    name      = "postgres-config"
-    namespace = kubernetes_namespace.postgres_druid
-
-    labels = {
-      app = "postgres"
-    }
-  }
-
-  data = {
-    POSTGRES_DB       = var.db_name
-    POSTGRES_PASSWORD = var.db_password
-    POSTGRES_USER     = var.db_username    
   }
 }
 
@@ -77,10 +58,10 @@ resource "kubernetes_service" "postgres_cs" {
 
 resource "kubernetes_stateful_set" "postgres" {
   count = var.enable ? 1 : 0
-  
+
   depends_on = [
     kubernetes_service.postgres_hs,
-    kubernetes_service.postgres_cs,    
+    kubernetes_service.postgres_cs,
   ]
 
   metadata {

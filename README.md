@@ -58,15 +58,21 @@ If you want to deploy Postgres without using different values for Database name,
 | druid\_image\_repository | Docker image of Apache Druid compatible for this module | `string` | `"apache-druid"` | no |
 | druid\_image\_tag | Docker image tag | `string` | `"0.18.1"` | no |
 | historical\_replicas | Number of replicas for the Historical service | `number` | `1` | no |
-| middlemanager\_replicas | Number of replicas for the Middlemanager service | `number` | `2` | no |
+| middlemanager\_replicas | Number of replicas for the Middlemanager service | `number` | `1` | no |
 | namespace | Namespace where Druid will be deployed | `string` | `"druid"` | no |
 | overlord\_replicas | Number of replicas for the Overlord service | `number` | `1` | no |
 | postgres\_db | Postgress Database name for Druid | `string` | `"druid"` | no |
+| postgres\_host | Postgress Database hostname for Druid | `string` | `"postgres-cs.druid.svc.cluster.local"` | no |
+| postgres\_namespace | namespace where to deploy the postgres resource | `string` | `"druid"` | no |
 | postgres\_password | Postgress Password of the user | `string` | `"druid"` | no |
+| postgres\_port | Postgress Database port for Druid | `string` | `"5432"` | no |
 | postgres\_user | Postgres username for accessing the DB | `string` | `"druid"` | no |
 | router\_replicas | Number of replicas for the Router service | `number` | `1` | no |
+| zookeeper\_host | Zookeeper hostname for Druid | `string` | `"zk-cs.druid.svc.cluster.local"` | no |
+| zookeeper\_namespace | namespace where to deploy the zookeeper resource | `string` | `"druid"` | no |
 | zookeeper\_replicas | Number of replicas for the Zookeeper service | `number` | `3` | no |
 
 ## Outputs
 
 No output.
+
