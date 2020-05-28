@@ -11,7 +11,7 @@ resource "kubernetes_service" "postgres_hs" {
 
   metadata {
     name      = "postgres-hs"
-    namespace = kubernetes_namespace.postgres_druid.metadata.0.name
+    namespace = kubernetes_namespace.postgres_druid[count.index].metadata.0.name
 
     labels = {
       app = "postgres"
@@ -37,7 +37,7 @@ resource "kubernetes_service" "postgres_cs" {
 
   metadata {
     name      = "postgres-cs"
-    namespace = kubernetes_namespace.postgres_druid.metadata.0.name
+    namespace = kubernetes_namespace.postgres_druid[count.index].metadata.0.name
 
     labels = {
       app = "postgres"
@@ -66,7 +66,7 @@ resource "kubernetes_stateful_set" "postgres" {
 
   metadata {
     name      = "postgres"
-    namespace = kubernetes_namespace.postgres_druid.metadata.0.name
+    namespace = kubernetes_namespace.postgres_druid[count.index].metadata.0.name
   }
 
   spec {
