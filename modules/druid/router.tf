@@ -113,7 +113,7 @@ resource "kubernetes_deployment" "router" {
 
           env {
             name  = "DRUID_JVM_ARGS"
-            value = "-server -Xms256m -Xmx256m -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
+            value = "-server -Xms512m -Xmx512m -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
           }
 
           resources {

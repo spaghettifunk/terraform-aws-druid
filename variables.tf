@@ -203,29 +203,24 @@ variable "postgres_password" {
 variable "aws_access_key" {
   type        = string
   description = "AWS Access Key value. Permissions needed for S3"
-  default     = ""
 }
 
 variable "aws_secret_key" {
   type        = string
   description = "AWS Secret Key value. Permissions needed for S3"
-  default     = ""
 }
 
 variable "aws_region" {
   type        = string
   description = "AWS region"
-  default     = ""
 }
 
 variable "aws_bucket_storage" {
   type        = string
-  description = "S3 bucket for storing the segments"
-  default     = ""
+  description = "S3 bucket for storing the segments"  
 }
 
 variable "aws_bucket_index" {
   type        = string
   description = "S3 bucket for storing the indexes"
-  default     = ""
 }

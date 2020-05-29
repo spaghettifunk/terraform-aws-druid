@@ -112,7 +112,7 @@ resource "kubernetes_deployment" "broker" {
 
           env {
             name  = "DRUID_JVM_ARGS"
-            value = "-server -Xms4G -Xmx4G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -XX:NewSize=4G -XX:MaxNewSize=4G -XX:MaxDirectMemorySize=12G -XX:+UseG1GC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
+            value = "-server -Xms8G -Xmx8G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -XX:+UseG1GC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
           }
 
           resources {
