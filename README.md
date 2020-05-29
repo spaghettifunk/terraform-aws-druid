@@ -1,12 +1,12 @@
 ![Lint](https://github.com/spaghettifunk/druid-terraform/workflows/Lint/badge.svg?branch=master)
 
-# Druid terraform
+# Apache Druid terraform
 
 This is a Terraform module for installing Druid on your Kubernetes cluster. This modules uses normal Kubernetes definitions files instead of the Helm Chart. Despite the Helm chart would make this module way more smaller, we think that for faster testing and deployment, it would have been simpler using multiple yaml files rather then templating.
 
-Currently the this module works only with S3. We <3 contributions! Open a PR to support multiple cloud providers.
+Currently the this module works only with `S3`. We :heart: contributions! Open a PR to support multiple cloud providers.
 
-## Build Druid image
+## Build the docker image
 
 To build the Druid docker image, follow the steps below:
 
@@ -16,7 +16,7 @@ To build the Druid docker image, follow the steps below:
 
 Remeber to use your own repository
 
-## Deploy Apache Druid
+## Deploy the module
 
 Once the image is built and pushed to the registry, you can install the module in your cluster.
 
@@ -28,7 +28,7 @@ If you are able to see all the services in the Druid UI it means that your clust
 
 In this module, we followed what the [production documentation](https://druid.apache.org/docs/latest/tutorials/cluster.html) explains. The location/colocation of the services are done by associating the nodes according to the `master`, `data` and `query` services.
 
-## Postsgres
+## Postsgres resource
 
 If you want to deploy Postgres without using different values for Database name, user and password, mind that you need to keep the same `namespace` as the druid resources. Those values are defined in a configmap and you cannot share configmaps across namespaces.
 
