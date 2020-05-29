@@ -49,16 +49,16 @@ If you want to deploy Postgres without using different values for Database name,
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| aws\_access\_key | AWS Access Key value. Permissions needed for S3 | `string` | `""` | no |
-| aws\_bucket\_index | S3 bucket for storing the indexes | `string` | `""` | no |
-| aws\_bucket\_storage | S3 bucket for storing the segments | `string` | `""` | no |
-| aws\_region | AWS region | `string` | `""` | no |
-| aws\_secret\_key | AWS Secret Key value. Permissions needed for S3 | `string` | `""` | no |
-| broker\_replicas | Number of replicas for the Broker service | `number` | `1` | no |
+| aws\_access\_key | AWS Access Key value. Permissions needed for S3 | `string` | n/a | yes |
+| aws\_bucket\_index | S3 bucket for storing the indexes | `string` | n/a | yes |
+| aws\_bucket\_storage | S3 bucket for storing the segments | `string` | n/a | yes |
+| aws\_region | AWS region | `string` | n/a | yes |
+| aws\_secret\_key | AWS Secret Key value. Permissions needed for S3 | `string` | n/a | yes |
+| broker\_replicas | Number of replicas for the Broker service | `number` | `3` | no |
 | coordinator\_replicas | Number of replicas for the Coordinator service | `number` | `1` | no |
 | create\_postgres | Controls if Postgres database resources should be created (it affects almost all resources) | `bool` | `true` | no |
 | create\_zookeeper | Controls if Zookeeper resources should be created (it affects almost all resources) | `bool` | `true` | no |
-| druid\_image\_registry | Docker registry used to fetch the Apache Druid image | `string` | `"spaghettifunk"` | no |
+| druid\_image\_registry | Docker registry used to fetch the Apache Druid image | `string` | `"davideberdin"` | no |
 | druid\_image\_repository | Docker image of Apache Druid compatible for this module | `string` | `"apache-druid"` | no |
 | druid\_image\_tag | Docker image tag | `string` | `"0.18.1"` | no |
 | historical\_replicas | Number of replicas for the Historical service | `number` | `1` | no |
@@ -72,11 +72,16 @@ If you want to deploy Postgres without using different values for Database name,
 | postgres\_port | Postgress Database port for Druid | `string` | `"5432"` | no |
 | postgres\_user | Postgres username for accessing the DB | `string` | `"druid"` | no |
 | router\_replicas | Number of replicas for the Router service | `number` | `1` | no |
-| zookeeper\_host | Zookeeper hostname for Druid | `string` | `"zk-cs.druid.svc.cluster.local"` | no |
-| zookeeper\_namespace | namespace where to deploy the zookeeper resource | `string` | `"druid"` | no |
+| tolerations\_broker | toleration to apply to the deployment of the broker | <pre>list(object({<br>    effect             = string<br>    key                = string<br>    operator           = string<br>    toleration_seconds = string<br>    value              = string<br>  }))</pre> | `[]` | no |
+| tolerations\_coordinator | toleration to apply to the deployment of the coordinator | <pre>list(object({<br>    effect             = string<br>    key                = string<br>    operator           = string<br>    toleration_seconds = string<br>    value              = string<br>  }))</pre> | `[]` | no |
+| tolerations\_historical | toleration to apply to the deployment of the historical | <pre>list(object({<br>    effect             = string<br>    key                = string<br>    operator           = string<br>    toleration_seconds = string<br>    value              = string<br>  }))</pre> | `[]` | no |
+| tolerations\_middlemanager | toleration to apply to the deployment of the middlemanager | <pre>list(object({<br>    effect             = string<br>    key                = string<br>    operator           = string<br>    toleration_seconds = string<br>    value              = string<br>  }))</pre> | `[]` | no |
+| tolerations\_overlord | toleration to apply to the deployment of the overlord | <pre>list(object({<br>    effect             = string<br>    key                = string<br>    operator           = string<br>    toleration_seconds = string<br>    value              = string<br>  }))</pre> | `[]` | no |
+| tolerations\_router | toleration to apply to the deployment of the router | <pre>list(object({<br>    effect             = string<br>    key                = string<br>    operator           = string<br>    toleration_seconds = string<br>    value              = string<br>  }))</pre> | `[]` | no |
+| zookeeper\_host | Zookeeper hostname for Druid | `string` | `"zk-cs.zk-druid.svc.cluster.local"` | no |
+| zookeeper\_namespace | namespace where to deploy the zookeeper resource | `string` | `"zk-druid"` | no |
 | zookeeper\_replicas | Number of replicas for the Zookeeper service | `number` | `3` | no |
 
 ## Outputs
 
 No output.
-
