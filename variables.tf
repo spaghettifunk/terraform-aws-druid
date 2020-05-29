@@ -217,7 +217,7 @@ variable "aws_region" {
 
 variable "aws_bucket_storage" {
   type        = string
-  description = "S3 bucket for storing the segments"  
+  description = "S3 bucket for storing the segments"
 }
 
 variable "aws_bucket_index" {
