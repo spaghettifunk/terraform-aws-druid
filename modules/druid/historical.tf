@@ -117,10 +117,8 @@ resource "kubernetes_deployment" "historical" {
           }
 
           resources {
-            limits {
-              memory = "8Gi"
-              cpu    = "512m"
-            }
+            limits   = locals.historical_limits
+            requests = locals.historical_requests
           }
 
           volume_mount {

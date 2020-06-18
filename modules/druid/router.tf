@@ -117,10 +117,8 @@ resource "kubernetes_deployment" "router" {
           }
 
           resources {
-            limits {
-              memory = "512Mi"
-              cpu    = "128m"
-            }
+            limits   = locals.router_limits
+            requests = locals.router_requests
           }
 
           volume_mount {

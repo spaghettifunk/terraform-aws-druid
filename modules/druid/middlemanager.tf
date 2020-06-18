@@ -117,10 +117,8 @@ resource "kubernetes_deployment" "middlemanager" {
           }
 
           resources {
-            limits {
-              memory = "8Gi"
-              cpu    = "512m"
-            }
+            limits   = locals.middlemanager_limits
+            requests = locals.middlemanager_requests
           }
 
           volume_mount {

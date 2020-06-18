@@ -23,10 +23,35 @@ variable "druid_image_tag" {
   default     = "0.18.1"
 }
 
+// Broker
 variable "broker_replicas" {
   type        = number
   description = "Number of replicas for the Broker service"
   default     = 3
+}
+
+variable "broker_requests_cpu" {
+  type        = string
+  description = "amount of cpu request for each broker"
+  default     = "512m"
+}
+
+variable "broker_requests_memory" {
+  type        = string
+  description = "amount of memory request for each broker"
+  default     = "8Gi"
+}
+
+variable "broker_limits_cpu" {
+  type        = string
+  description = "amount of cpu limits for each broker"
+  default     = "512m"
+}
+
+variable "broker_limits_memory" {
+  type        = string
+  description = "amount of memory limits for each broker"
+  default     = "8Gi"
 }
 
 variable "tolerations_broker" {
@@ -41,10 +66,35 @@ variable "tolerations_broker" {
   default = []
 }
 
+// Coordinator
 variable "coordinator_replicas" {
   type        = number
   description = "Number of replicas for the Coordinator service"
   default     = 1
+}
+
+variable "coordinator_requests_cpu" {
+  type        = string
+  description = "amount of cpu request for each coordinator"
+  default     = "256m"
+}
+
+variable "coordinator_requests_memory" {
+  type        = string
+  description = "amount of memory request for each coordinator"
+  default     = "2Gi"
+}
+
+variable "coordinator_limits_cpu" {
+  type        = string
+  description = "amount of cpu limits for each coordinator"
+  default     = "256m"
+}
+
+variable "coordinator_limits_memory" {
+  type        = string
+  description = "amount of memory limits for each coordinator"
+  default     = "2Gi"
 }
 
 variable "tolerations_coordinator" {
@@ -59,10 +109,35 @@ variable "tolerations_coordinator" {
   default = []
 }
 
+// Historical
 variable "historical_replicas" {
   type        = number
   description = "Number of replicas for the Historical service"
   default     = 1
+}
+
+variable "historical_requests_cpu" {
+  type        = string
+  description = "amount of cpu request for each historical"
+  default     = "512m"
+}
+
+variable "historical_requests_memory" {
+  type        = string
+  description = "amount of memory request for each historical"
+  default     = "8Gi"
+}
+
+variable "historical_limits_cpu" {
+  type        = string
+  description = "amount of cpu limits for each historical"
+  default     = "512m"
+}
+
+variable "historical_limits_memory" {
+  type        = string
+  description = "amount of memory limits for each historical"
+  default     = "8Gi"
 }
 
 variable "tolerations_historical" {
@@ -77,10 +152,35 @@ variable "tolerations_historical" {
   default = []
 }
 
+// Middlemanager
 variable "middlemanager_replicas" {
   type        = number
   description = "Number of replicas for the Middlemanager service"
   default     = 1
+}
+
+variable "middlemanager_requests_cpu" {
+  type        = string
+  description = "amount of cpu request for each middlemanager"
+  default     = "512m"
+}
+
+variable "middlemanager_requests_memory" {
+  type        = string
+  description = "amount of memory request for each middlemanager"
+  default     = "8Gi"
+}
+
+variable "middlemanager_limits_cpu" {
+  type        = string
+  description = "amount of cpu limits for each middlemanager"
+  default     = "512m"
+}
+
+variable "middlemanager_limits_memory" {
+  type        = string
+  description = "amount of memory limits for each middlemanager"
+  default     = "8Gi"
 }
 
 variable "tolerations_middlemanager" {
@@ -95,10 +195,35 @@ variable "tolerations_middlemanager" {
   default = []
 }
 
+// Overlord
 variable "overlord_replicas" {
   type        = number
   description = "Number of replicas for the Overlord service"
   default     = 1
+}
+
+variable "overlord_requests_cpu" {
+  type        = string
+  description = "amount of cpu request for each overlord"
+  default     = "512m"
+}
+
+variable "overlord_requests_memory" {
+  type        = string
+  description = "amount of memory request for each overlord"
+  default     = "2Gi"
+}
+
+variable "overlord_limits_cpu" {
+  type        = string
+  description = "amount of cpu limits for each overlord"
+  default     = "512m"
+}
+
+variable "overlord_limits_memory" {
+  type        = string
+  description = "amount of memory limits for each overlord"
+  default     = "2Gi"
 }
 
 variable "tolerations_overlord" {
@@ -113,10 +238,35 @@ variable "tolerations_overlord" {
   default = []
 }
 
+// Router
 variable "router_replicas" {
   type        = number
   description = "Number of replicas for the Router service"
   default     = 1
+}
+
+variable "router_requests_cpu" {
+  type        = string
+  description = "amount of cpu request for each router"
+  default     = "128m"
+}
+
+variable "router_requests_memory" {
+  type        = string
+  description = "amount of memory request for each router"
+  default     = "512Mi"
+}
+
+variable "router_limits_cpu" {
+  type        = string
+  description = "amount of cpu limits for each router"
+  default     = "128m"
+}
+
+variable "router_limits_memory" {
+  type        = string
+  description = "amount of memory limits for each router"
+  default     = "512Mi"
 }
 
 variable "tolerations_router" {

@@ -117,10 +117,8 @@ resource "kubernetes_deployment" "overlord" {
           }
 
           resources {
-            limits {
-              memory = "2Gi"
-              cpu    = "512m"
-            }
+            limits   = locals.overlord_limits
+            requests = locals.overlord_requests
           }
 
           volume_mount {

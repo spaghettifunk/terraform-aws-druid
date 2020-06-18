@@ -116,10 +116,8 @@ resource "kubernetes_deployment" "broker" {
           }
 
           resources {
-            limits {
-              memory = "8Gi"
-              cpu    = "512m"
-            }
+            limits   = locals.broker_limits
+            requests = locals.broker_requests
           }
 
           volume_mount {

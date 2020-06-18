@@ -117,10 +117,8 @@ resource "kubernetes_deployment" "coordinator" {
           }
 
           resources {
-            limits {
-              memory = "2Gi"
-              cpu    = "256m"
-            }
+            limits   = locals.coordinator_limits
+            requests = locals.coordinator_requests
           }
 
           volume_mount {
