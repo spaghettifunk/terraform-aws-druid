@@ -131,6 +131,43 @@ variable "tolerations_router" {
   default = []
 }
 
+// Druid Ingress objects
+variable "enable_brokers_ingress" {
+  description = "enable the ingress object for the brokers for external access"
+  type        = bool
+  default     = false
+}
+
+variable "brokers_annotations_ingress" {
+  description = "list of annotations to add in the ingress object"
+  type        = map(string)
+  default     = {}
+}
+
+variable "brokers_host" {
+  description = "host to use for accessing the brokers"
+  type        = string
+  default     = ""
+}
+
+variable "enable_router_ingress" {
+  description = "enable the ingress object for the router for external access"
+  type        = bool
+  default     = false
+}
+
+variable "router_annotations_ingress" {
+  description = "list of annotations to add in the ingress object"
+  type        = map(string)
+  default     = {}
+}
+
+variable "router_host" {
+  description = "host to use for accessing the router"
+  type        = string
+  default     = ""
+}
+
 // Zookeeper variables
 variable "create_zookeeper" {
   description = "Controls if Zookeeper resources should be created (it affects almost all resources)"

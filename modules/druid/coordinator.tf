@@ -1,27 +1,3 @@
-resource "kubernetes_service" "coordinator_hs" {
-  metadata {
-    name      = "coordinator-hs"
-    namespace = var.namespace
-
-    labels = {
-      app = "coordinator"
-    }
-  }
-
-  spec {
-    port {
-      name = "coordinator"
-      port = 8081
-    }
-
-    selector = {
-      app = "coordinator"
-    }
-
-    cluster_ip = "None"
-  }
-}
-
 resource "kubernetes_service" "coordinator_cs" {
   metadata {
     name      = "coordinator-cs"
