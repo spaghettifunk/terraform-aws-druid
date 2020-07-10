@@ -1,27 +1,3 @@
-resource "kubernetes_service" "historical_hs" {
-  metadata {
-    name      = "historical-hs"
-    namespace = var.namespace
-
-    labels = {
-      app = "historical"
-    }
-  }
-
-  spec {
-    port {
-      name = "historical"
-      port = 8083
-    }
-
-    selector = {
-      app = "historical"
-    }
-
-    cluster_ip = "None"
-  }
-}
-
 resource "kubernetes_service" "historical_cs" {
   metadata {
     name      = "historical-cs"

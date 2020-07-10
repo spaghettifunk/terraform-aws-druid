@@ -1,27 +1,3 @@
-resource "kubernetes_service" "broker_hs" {
-  metadata {
-    name      = "broker-hs"
-    namespace = var.namespace
-
-    labels = {
-      app = "broker"
-    }
-  }
-
-  spec {
-    port {
-      name = "broker"
-      port = 8082
-    }
-
-    selector = {
-      app = "broker"
-    }
-
-    cluster_ip = "None"
-  }
-}
-
 resource "kubernetes_service" "broker_cs" {
   metadata {
     name      = "broker-cs"
@@ -200,6 +176,31 @@ resource "kubernetes_deployment" "broker" {
         }
 
         termination_grace_period_seconds = 1800
+      }
+    }
+  }
+}
+
+resource "kubernetes_ingress" "brokers" {
+  count = var.enable_brokers_ingress ? 1 : 0
+
+  metadata {
+    name        = "brokers"
+    namespace   = var.namespace
+    annotations = var.brokers_annotations_ingress
+  }
+
+  spec {
+    rule {
+      host = var.brokers_host
+      http {
+        path {
+          path = "/"
+          backend {
+            service_name = kubernetes_service.broker_cs.metadata.0.name
+            service_port = kubernetes_service.broker_cs.spec.port.0.port
+          }
+        }
       }
     }
   }
