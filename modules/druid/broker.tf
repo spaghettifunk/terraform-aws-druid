@@ -198,7 +198,7 @@ resource "kubernetes_ingress" "brokers" {
           path = "/"
           backend {
             service_name = kubernetes_service.broker_cs.metadata.0.name
-            service_port = kubernetes_service.broker_cs.spec.port.0.port
+            service_port = kubernetes_service.broker_cs.spec.0.port.0.port
           }
         }
       }

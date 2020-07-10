@@ -183,7 +183,7 @@ resource "kubernetes_ingress" "router" {
           path = "/"
           backend {
             service_name = kubernetes_service.router_cs.metadata.0.name
-            service_port = kubernetes_service.router_cs.spec.port.0.port
+            service_port = kubernetes_service.router_cs.spec.0.port.0.port
           }
         }
       }
