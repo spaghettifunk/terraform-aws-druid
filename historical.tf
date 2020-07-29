@@ -1,59 +1,44 @@
-resource "kubernetes_service" "coordinator_cs" {
+resource "kubernetes_service" "historical_cs" {
   metadata {
-    name      = "coordinator-cs"
+    name      = "historical-cs"
     namespace = var.namespace
 
-    labels = {
-      app = "coordinator"
-    }
+    labels = local.historical_labels
   }
-
   spec {
     port {
-      name = "coordinator"
-      port = 8081
+      name = "historical"
+      port = 8083
     }
-
-    selector = {
-      app = "coordinator"
-    }
+    selector = local.historical_labels
   }
 }
 
-resource "kubernetes_deployment" "coordinator" {
+resource "kubernetes_deployment" "historical" {
   metadata {
-    name      = "coordinator"
+    name      = "historical"
     namespace = var.namespace
-
-    labels = {
-      app = "coordinator"
-    }
+    labels    = local.historical_labels
   }
 
   spec {
-    replicas = var.coordinator_replicas
-
+    replicas = var.historical_replicas
     selector {
-      match_labels = {
-        app = "coordinator"
-      }
+      match_labels = local.historical_labels
     }
-
     template {
       metadata {
-        labels = {
-          app = "coordinator"
-        }
+        labels = local.historical_labels
       }
-
       spec {
         container {
-          name  = "coordinator"
-          image = var.druid_image
+          name              = "historical"
+          image             = local.druid_image
+          image_pull_policy = "Always"
 
           port {
-            name           = "coordinator"
-            container_port = 8081
+            name           = "historical"
+            container_port = 8083
           }
 
           env_from {
@@ -62,9 +47,10 @@ resource "kubernetes_deployment" "coordinator" {
             }
           }
 
-          env {
-            name  = "DRUID_SERVICE_PORT"
-            value = "8081"
+          env_from {
+            secret_ref {
+              name = "druid-secret"
+            }
           }
 
           env {
@@ -76,26 +62,22 @@ resource "kubernetes_deployment" "coordinator" {
             }
           }
 
-          env {
-            name  = "DRUID_SERVICE"
-            value = "coordinator"
-          }
-
-          env {
-            name  = "DRUID_JVM_ARGS"
-            value = "-server -Xms2G -Xmx2G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -Dderby.stream.error.file=var/druid/derby.log"
-          }
-
-          env_from {
-            secret_ref {
-              name = "druid-secret"
+          dynamic "env" {
+            for_each = local.historical_env_variables
+            content {
+              name  = env.value.name
+              value = env.value.value
             }
           }
 
           resources {
             limits {
-              memory = "2Gi"
-              cpu    = "256m"
+              cpu    = var.historical_limits_cpu
+              memory = var.historical_limits_memory
+            }
+            requests {
+              cpu    = var.historical_requests_cpu
+              memory = var.historical_requests_memory
             }
           }
 
@@ -107,7 +89,7 @@ resource "kubernetes_deployment" "coordinator" {
           liveness_probe {
             http_get {
               path = "/status/health"
-              port = "8081"
+              port = "8083"
             }
 
             initial_delay_seconds = 60
@@ -116,13 +98,11 @@ resource "kubernetes_deployment" "coordinator" {
           readiness_probe {
             http_get {
               path = "/status/health"
-              port = "8081"
+              port = "8083"
             }
 
             initial_delay_seconds = 60
           }
-
-          image_pull_policy = "Always"
 
           security_context {
             capabilities {
@@ -133,6 +113,7 @@ resource "kubernetes_deployment" "coordinator" {
 
         volume {
           name = "druid-secret"
+
           secret {
             secret_name = "druid-secret"
           }
@@ -143,7 +124,7 @@ resource "kubernetes_deployment" "coordinator" {
         }
 
         dynamic "toleration" {
-          for_each = [for t in var.tolerations_coordinator : {
+          for_each = [for t in var.historical_tolerations : {
             effect             = t.effect
             key                = t.key
             operator           = t.operator
@@ -167,14 +148,13 @@ resource "kubernetes_deployment" "coordinator" {
                 match_expressions {
                   key      = "app"
                   operator = "In"
-                  values   = ["coordinator"]
+                  values   = ["historical"]
                 }
               }
               topology_key = "kubernetes.io/hostname"
             }
           }
         }
-
         termination_grace_period_seconds = 1800
       }
     }

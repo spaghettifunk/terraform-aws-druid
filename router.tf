@@ -1,59 +1,46 @@
-resource "kubernetes_service" "mm_cs" {
+resource "kubernetes_service" "router_cs" {
   metadata {
-    name      = "mm-cs"
+    name      = "router-cs"
     namespace = var.namespace
-
-    labels = {
-      app = "middlemanager"
-    }
+    labels    = local.router_labels
   }
-
   spec {
     port {
-      name = "mm"
-      port = 8084
+      name = "router"
+      port = 8888
     }
-
-    selector = {
-      app = "middlemanager"
-    }
+    selector = local.router_labels
   }
 }
 
-resource "kubernetes_deployment" "middlemanager" {
+resource "kubernetes_deployment" "router" {
   metadata {
-    name      = "middlemanager"
+    name      = "router"
     namespace = var.namespace
-
-    labels = {
-      app = "middlemanager"
-    }
+    labels    = local.router_labels
   }
 
   spec {
-    replicas = var.middlemanager_replicas
+    replicas = var.router_replicas
 
     selector {
-      match_labels = {
-        app = "middlemanager"
-      }
+      match_labels = local.router_labels
     }
 
     template {
       metadata {
-        labels = {
-          app = "middlemanager"
-        }
+        labels = local.router_labels
       }
 
       spec {
         container {
-          name  = "middlemanager"
-          image = var.druid_image
+          name              = "router"
+          image             = local.druid_image
+          image_pull_policy = "Always"
 
           port {
-            name           = "middlemanager"
-            container_port = 8084
+            name           = "router"
+            container_port = 8888
           }
 
           env_from {
@@ -62,9 +49,10 @@ resource "kubernetes_deployment" "middlemanager" {
             }
           }
 
-          env {
-            name  = "DRUID_SERVICE_PORT"
-            value = "8084"
+          env_from {
+            secret_ref {
+              name = "druid-secret"
+            }
           }
 
           env {
@@ -76,26 +64,22 @@ resource "kubernetes_deployment" "middlemanager" {
             }
           }
 
-          env {
-            name  = "DRUID_SERVICE"
-            value = "middleManager"
-          }
-
-          env {
-            name  = "DRUID_JVM_ARGS"
-            value = "-server -Xms8G -Xmx8G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
-          }
-
-          env_from {
-            secret_ref {
-              name = "druid-secret"
+          dynamic "env" {
+            for_each = local.router_env_variables
+            content {
+              name  = env.value.name
+              value = env.value.value
             }
           }
 
           resources {
             limits {
-              memory = "8Gi"
-              cpu    = "512m"
+              cpu    = var.router_limits_cpu
+              memory = var.router_limits_memory
+            }
+            requests {
+              cpu    = var.router_requests_cpu
+              memory = var.router_requests_memory
             }
           }
 
@@ -107,7 +91,7 @@ resource "kubernetes_deployment" "middlemanager" {
           liveness_probe {
             http_get {
               path = "/status/health"
-              port = "8084"
+              port = "8888"
             }
 
             initial_delay_seconds = 60
@@ -116,13 +100,12 @@ resource "kubernetes_deployment" "middlemanager" {
           readiness_probe {
             http_get {
               path = "/status/health"
-              port = "8084"
+              port = "8888"
             }
 
             initial_delay_seconds = 60
           }
 
-          image_pull_policy = "Always"
 
           security_context {
             capabilities {
@@ -133,7 +116,6 @@ resource "kubernetes_deployment" "middlemanager" {
 
         volume {
           name = "druid-secret"
-
           secret {
             secret_name = "druid-secret"
           }
@@ -144,7 +126,7 @@ resource "kubernetes_deployment" "middlemanager" {
         }
 
         dynamic "toleration" {
-          for_each = [for t in var.tolerations_middlemanager : {
+          for_each = [for t in var.router_tolerations : {
             effect             = t.effect
             key                = t.key
             operator           = t.operator
@@ -161,22 +143,32 @@ resource "kubernetes_deployment" "middlemanager" {
           }
         }
 
-        affinity {
-          pod_anti_affinity {
-            required_during_scheduling_ignored_during_execution {
-              label_selector {
-                match_expressions {
-                  key      = "app"
-                  operator = "In"
-                  values   = ["middlemanager"]
-                }
-              }
-              topology_key = "kubernetes.io/hostname"
-            }
+        termination_grace_period_seconds = 1800
+      }
+    }
+  }
+}
+
+resource "kubernetes_ingress" "router" {
+  count = var.enable_router_ingress ? 1 : 0
+
+  metadata {
+    name        = "router"
+    namespace   = var.namespace
+    annotations = var.router_annotations_ingress
+  }
+
+  spec {
+    rule {
+      host = var.router_host
+      http {
+        path {
+          path = "/"
+          backend {
+            service_name = kubernetes_service.router_cs.metadata.0.name
+            service_port = kubernetes_service.router_cs.spec.0.port.0.port
           }
         }
-
-        termination_grace_period_seconds = 1800
       }
     }
   }

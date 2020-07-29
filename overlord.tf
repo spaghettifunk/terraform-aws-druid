@@ -1,65 +1,50 @@
-resource "kubernetes_service" "historical_cs" {
+resource "kubernetes_service" "overlord_cs" {
   metadata {
-    name      = "historical-cs"
+    name      = "overlord-cs"
     namespace = var.namespace
 
     labels = {
-      app = "historical"
+      app = "overlord"
     }
   }
 
   spec {
     port {
-      name = "historical"
-      port = 8083
+      name = "overlord"
+      port = 8090
     }
 
     selector = {
-      app = "historical"
+      app = "overlord"
     }
   }
 }
 
-resource "kubernetes_deployment" "historical" {
+resource "kubernetes_deployment" "overlord" {
   metadata {
-    name      = "historical"
+    name      = "overlord"
     namespace = var.namespace
-
-    labels = {
-      app = "historical"
-    }
+    labels    = local.overlord_labels
   }
 
   spec {
-    replicas = var.historical_replicas
-
+    replicas = var.overlord_replicas
     selector {
-      match_labels = {
-        app = "historical"
-      }
+      match_labels = local.overlord_labels
     }
-
     template {
       metadata {
-        labels = {
-          app = "historical"
-        }
+        labels = local.overlord_labels
       }
-
       spec {
         container {
-          name  = "historical"
-          image = var.druid_image
+          name              = "overlord"
+          image             = local.druid_image
+          image_pull_policy = "Always"
 
           port {
-            name           = "historical"
-            container_port = 8083
-          }
-
-          env_from {
-            config_map_ref {
-              name = "druid-common-config"
-            }
+            name           = "overlord"
+            container_port = 8090
           }
 
           env_from {
@@ -68,9 +53,10 @@ resource "kubernetes_deployment" "historical" {
             }
           }
 
-          env {
-            name  = "DRUID_SERVICE_PORT"
-            value = "8083"
+          env_from {
+            config_map_ref {
+              name = "druid-common-config"
+            }
           }
 
           env {
@@ -82,20 +68,22 @@ resource "kubernetes_deployment" "historical" {
             }
           }
 
-          env {
-            name  = "DRUID_SERVICE"
-            value = "historical"
-          }
-
-          env {
-            name  = "DRUID_JVM_ARGS"
-            value = "-server -Xms8G -Xmx8G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -XX:+UseConcMarkSweepGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
+          dynamic "env" {
+            for_each = local.overlord_env_variables
+            content {
+              name  = env.value.name
+              value = env.value.value
+            }
           }
 
           resources {
             limits {
-              memory = "8Gi"
-              cpu    = "512m"
+              cpu    = var.overlord_limits_cpu
+              memory = var.overlord_limits_memory
+            }
+            requests {
+              cpu    = var.overlord_requests_cpu
+              memory = var.overlord_requests_memory
             }
           }
 
@@ -107,22 +95,19 @@ resource "kubernetes_deployment" "historical" {
           liveness_probe {
             http_get {
               path = "/status/health"
-              port = "8083"
+              port = "8090"
             }
-
             initial_delay_seconds = 60
           }
 
           readiness_probe {
             http_get {
               path = "/status/health"
-              port = "8083"
+              port = "8090"
             }
-
             initial_delay_seconds = 60
           }
 
-          image_pull_policy = "Always"
 
           security_context {
             capabilities {
@@ -133,7 +118,6 @@ resource "kubernetes_deployment" "historical" {
 
         volume {
           name = "druid-secret"
-
           secret {
             secret_name = "druid-secret"
           }
@@ -144,7 +128,7 @@ resource "kubernetes_deployment" "historical" {
         }
 
         dynamic "toleration" {
-          for_each = [for t in var.tolerations_historical : {
+          for_each = [for t in var.overlord_tolerations : {
             effect             = t.effect
             key                = t.key
             operator           = t.operator
@@ -168,7 +152,7 @@ resource "kubernetes_deployment" "historical" {
                 match_expressions {
                   key      = "app"
                   operator = "In"
-                  values   = ["historical"]
+                  values   = ["overlord"]
                 }
               }
               topology_key = "kubernetes.io/hostname"

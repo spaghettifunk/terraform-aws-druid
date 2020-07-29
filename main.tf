@@ -36,31 +36,3 @@ module "zookeeper" {
   namespace = var.zookeeper_namespace
   replicas  = var.zookeeper_replicas
 }
-
-module "druid" {
-  source = "./modules/druid"
-
-  namespace   = kubernetes_namespace.druid.metadata.0.name
-  druid_image = local.druid_image
-
-  broker_replicas        = var.broker_replicas
-  coordinator_replicas   = var.coordinator_replicas
-  historical_replicas    = var.historical_replicas
-  middlemanager_replicas = var.middlemanager_replicas
-  overlord_replicas      = var.overlord_replicas
-  router_replicas        = var.router_replicas
-
-  tolerations_broker        = var.tolerations_broker
-  tolerations_coordinator   = var.tolerations_coordinator
-  tolerations_historical    = var.tolerations_historical
-  tolerations_middlemanager = var.tolerations_middlemanager
-  tolerations_overlord      = var.tolerations_overlord
-  tolerations_router        = var.tolerations_router
-
-  enable_brokers_ingress      = var.enable_brokers_ingress
-  brokers_annotations_ingress = var.brokers_annotations_ingress
-  brokers_host                = var.brokers_host
-  enable_router_ingress       = var.enable_router_ingress
-  router_annotations_ingress  = var.router_annotations_ingress
-  router_host                 = var.router_host
-}

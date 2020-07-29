@@ -1,58 +1,43 @@
-resource "kubernetes_service" "broker_cs" {
+resource "kubernetes_service" "coordinator_cs" {
   metadata {
-    name      = "broker-cs"
+    name      = "coordinator-cs"
     namespace = var.namespace
-
-    labels = {
-      app = "broker"
-    }
+    labels    = local.coordinator_labels
   }
-
   spec {
     port {
-      name = "broker"
-      port = 8082
+      name = "coordinator"
+      port = 8081
     }
-
-    selector = {
-      app = "broker"
-    }
+    selector = local.coordinator_labels
   }
 }
 
-resource "kubernetes_deployment" "broker" {
+resource "kubernetes_deployment" "coordinator" {
   metadata {
-    name      = "broker"
+    name      = "coordinator"
     namespace = var.namespace
-
-    labels = {
-      app = "broker"
-    }
+    labels    = local.coordinator_labels
   }
 
   spec {
-    replicas = var.broker_replicas
+    replicas = var.coordinator_replicas
     selector {
-      match_labels = {
-        app = "broker"
-      }
+      match_labels = local.coordinator_labels
     }
-
     template {
       metadata {
-        labels = {
-          app = "broker"
-        }
+        labels = local.coordinator_labels
       }
-
       spec {
         container {
-          name  = "broker"
-          image = var.druid_image
+          name              = "coordinator"
+          image             = local.druid_image
+          image_pull_policy = "Always"
 
           port {
-            name           = "broker"
-            container_port = 8082
+            name           = "coordinator"
+            container_port = 8081
           }
 
           env_from {
@@ -68,11 +53,6 @@ resource "kubernetes_deployment" "broker" {
           }
 
           env {
-            name  = "DRUID_SERVICE_PORT"
-            value = "8082"
-          }
-
-          env {
             name = "DRUID_HOST"
             value_from {
               field_ref {
@@ -81,20 +61,22 @@ resource "kubernetes_deployment" "broker" {
             }
           }
 
-          env {
-            name  = "DRUID_SERVICE"
-            value = "broker"
-          }
-
-          env {
-            name  = "DRUID_JVM_ARGS"
-            value = "-server -Xms8G -Xmx8G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -XX:+UseG1GC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
+          dynamic "env" {
+            for_each = local.coordinator_env_variables
+            content {
+              name  = env.value.name
+              value = env.value.value
+            }
           }
 
           resources {
             limits {
-              memory = "8Gi"
-              cpu    = "512m"
+              cpu    = var.coordinator_limits_cpu
+              memory = var.coordinator_limits_memory
+            }
+            requests {
+              cpu    = var.coordinator_requests_cpu
+              memory = var.coordinator_requests_memory
             }
           }
 
@@ -106,7 +88,7 @@ resource "kubernetes_deployment" "broker" {
           liveness_probe {
             http_get {
               path = "/status/health"
-              port = "8082"
+              port = "8081"
             }
 
             initial_delay_seconds = 60
@@ -115,13 +97,11 @@ resource "kubernetes_deployment" "broker" {
           readiness_probe {
             http_get {
               path = "/status/health"
-              port = "8082"
+              port = "8081"
             }
 
             initial_delay_seconds = 60
           }
-
-          image_pull_policy = "Always"
 
           security_context {
             capabilities {
@@ -129,9 +109,17 @@ resource "kubernetes_deployment" "broker" {
             }
           }
         }
-
+        volume {
+          name = "druid-secret"
+          secret {
+            secret_name = "druid-secret"
+          }
+        }
+        volume {
+          name = "data"
+        }
         dynamic "toleration" {
-          for_each = [for t in var.tolerations_broker : {
+          for_each = [for t in var.coordinator_tolerations : {
             effect             = t.effect
             key                = t.key
             operator           = t.operator
@@ -147,19 +135,6 @@ resource "kubernetes_deployment" "broker" {
             value              = toleration.value.value
           }
         }
-
-        volume {
-          name = "druid-secret"
-
-          secret {
-            secret_name = "druid-secret"
-          }
-        }
-
-        volume {
-          name = "data"
-        }
-
         affinity {
           pod_anti_affinity {
             required_during_scheduling_ignored_during_execution {
@@ -167,40 +142,14 @@ resource "kubernetes_deployment" "broker" {
                 match_expressions {
                   key      = "app"
                   operator = "In"
-                  values   = ["broker"]
+                  values   = ["coordinator"]
                 }
               }
               topology_key = "kubernetes.io/hostname"
             }
           }
         }
-
         termination_grace_period_seconds = 1800
-      }
-    }
-  }
-}
-
-resource "kubernetes_ingress" "brokers" {
-  count = var.enable_brokers_ingress ? 1 : 0
-
-  metadata {
-    name        = "brokers"
-    namespace   = var.namespace
-    annotations = var.brokers_annotations_ingress
-  }
-
-  spec {
-    rule {
-      host = var.brokers_host
-      http {
-        path {
-          path = "/"
-          backend {
-            service_name = kubernetes_service.broker_cs.metadata.0.name
-            service_port = kubernetes_service.broker_cs.spec.0.port.0.port
-          }
-        }
       }
     }
   }
