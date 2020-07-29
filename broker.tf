@@ -143,3 +143,28 @@ resource "kubernetes_deployment" "broker" {
     }
   }
 }
+
+resource "kubernetes_ingress" "brokers" {
+  count = var.enable_brokers_ingress ? 1 : 0
+
+  metadata {
+    name        = "brokers"
+    namespace   = var.namespace
+    annotations = var.brokers_annotations_ingress
+  }
+
+  spec {
+    rule {
+      host = var.brokers_host
+      http {
+        path {
+          path = "/"
+          backend {
+            service_name = kubernetes_service.broker_cs.metadata.0.name
+            service_port = kubernetes_service.broker_cs.spec.0.port.0.port
+          }
+        }
+      }
+    }
+  }
+}

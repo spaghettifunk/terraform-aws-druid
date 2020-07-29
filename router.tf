@@ -148,3 +148,28 @@ resource "kubernetes_deployment" "router" {
     }
   }
 }
+
+resource "kubernetes_ingress" "router" {
+  count = var.enable_router_ingress ? 1 : 0
+
+  metadata {
+    name        = "router"
+    namespace   = var.namespace
+    annotations = var.router_annotations_ingress
+  }
+
+  spec {
+    rule {
+      host = var.router_host
+      http {
+        path {
+          path = "/"
+          backend {
+            service_name = kubernetes_service.router_cs.metadata.0.name
+            service_port = kubernetes_service.router_cs.spec.0.port.0.port
+          }
+        }
+      }
+    }
+  }
+}
