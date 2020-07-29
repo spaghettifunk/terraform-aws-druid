@@ -38,8 +38,8 @@ resource "kubernetes_deployment" "overlord" {
       }
       spec {
         container {
-          name  = "overlord"
-          image = local.druid_image
+          name              = "overlord"
+          image             = local.druid_image
           image_pull_policy = "Always"
 
           port {
