@@ -4,13 +4,21 @@ locals {
   postgres_url     = var.postgres_host
   zookeeper_server = var.zookeeper_host
 
-  broker_labels = {
-    app = "broker"
-  }
+  # labels
+  broker_labels        = { app = "broker" }
+  overlord_labels      = { app = "overlord" }
+  middlemanager_labels = { app = "middlemanager" }
+  historical_labels    = { app = "historical" }
+  coordinator_labels   = { app = "coordinator" }
+  router_labels        = { app = "router" }
+
+  # JVM settings
+  common_JVM = "-Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
+
   broker_env_variables = [
     {
       name  = "DRUID_SERVICE_PORT"
-      value = "8082"
+      value = var.broker_port
     },
     {
       name  = "DRUID_SERVICE"
@@ -18,17 +26,14 @@ locals {
     },
     {
       name  = "DRUID_JVM_ARGS"
-      value = "-server -Xms8G -Xmx8G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -XX:+UseG1GC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
+      value = format("-server -Xms%s -Xmx%s -XX:+UseG1GC", replace(var.broker_limits_memory, "i", ""), replace(var.broker_limits_memory, "i", ""))
     }
   ]
 
-  overlord_labels = {
-    app = "overlord"
-  }
   overlord_env_variables = [
     {
       name  = "DRUID_SERVICE_PORT"
-      value = "8090"
+      value = var.overlord_port
     },
     {
       name  = "DRUID_SERVICE"
@@ -36,17 +41,14 @@ locals {
     },
     {
       name  = "DRUID_JVM_ARGS"
-      value = "-server -Xms2G -Xmx2G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
+      value = format("-server -Xms%s -Xmx%s", replace(var.overlord_limits_memory, "i", ""), replace(var.overlord_limits_memory, "i", ""))
     }
   ]
 
-  middlemanager_labels = {
-    app = "middlemanager"
-  }
   middlemanager_env_variables = [
     {
       name  = "DRUID_SERVICE_PORT"
-      value = "8084"
+      value = var.middlemanager_port
     },
     {
       name  = "DRUID_SERVICE"
@@ -54,17 +56,14 @@ locals {
     },
     {
       name  = "DRUID_JVM_ARGS"
-      value = "-server -Xms8G -Xmx8G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
+      value = format("-server -Xms%s -Xmx%s", replace(var.middlemanager_limits_memory, "i", ""), replace(var.middlemanager_limits_memory, "i", ""))
     }
   ]
 
-  historical_labels = {
-    app = "historical"
-  }
   historical_env_variables = [
     {
       name  = "DRUID_SERVICE_PORT"
-      value = "8083"
+      value = var.historical_port
     },
     {
       name  = "DRUID_SERVICE"
@@ -72,17 +71,14 @@ locals {
     },
     {
       name  = "DRUID_JVM_ARGS"
-      value = "-server -Xms8G -Xmx8G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -XX:+UseConcMarkSweepGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
+      value = format("-server -Xms%s -Xmx%s", replace(var.historical_limits_memory, "i", ""), replace(var.historical_limits_memory, "i", ""))
     }
   ]
 
-  coordinator_labels = {
-    app = "coordinator"
-  }
   coordinator_env_variables = [
     {
       name  = "DRUID_SERVICE_PORT"
-      value = "8081"
+      value = var.coordinator_port
     },
     {
       name  = "DRUID_SERVICE"
@@ -90,17 +86,14 @@ locals {
     },
     {
       name  = "DRUID_JVM_ARGS"
-      value = "-server -Xm2G -Xmx2G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -Dderby.stream.error.file=var/druid/derby.log"
+      value = format("-server -Xms%s -Xmx%s", replace(var.coordinator_limits_memory, "i", ""), replace(var.coordinator_limits_memory, "i", ""))
     }
   ]
 
-  router_labels = {
-    app = "router"
-  }
   router_env_variables = [
     {
       name  = "DRUID_SERVICE_PORT"
-      value = "8888"
+      value = var.router_port
     },
     {
       name  = "DRUID_SERVICE"
@@ -108,8 +101,7 @@ locals {
     },
     {
       name  = "DRUID_JVM_ARGS"
-      value = "-server -Xms512m -Xmx512m -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
+      value = format("-server -Xms%s -Xmx%s", replace(var.router_limits_memory, "i", ""), replace(var.router_limits_memory, "i", ""))
     }
   ]
 }
-
