@@ -411,3 +411,35 @@ variable "aws_bucket_index" {
   type        = string
   description = "S3 bucket for storing the indexes"
 }
+
+variable "broker_port" {
+  type        = string
+  description = "port exposed for the broker service"
+  default     = "8082"
+}
+
+variable "overlord_port" {
+  type        = string
+  description = "port exposed for the overlord service"
+  default     = "8090"
+}
+variable "middlemanager_port" {
+  type        = string
+  description = "port exposed for the middlemanager service"
+  default     = "8084"
+}
+variable "historical_port" {
+  type        = string
+  description = "port exposed for the historical service"
+  default     = "8083"
+}
+variable "coordinator_port" {
+  type        = string
+  description = "port exposed for the coordinator service"
+  default     = "8081"
+}
+variable "router_port" {
+  type        = string
+  description = "port exposed for the router service"
+  default     = "8888"
+}
