@@ -116,8 +116,8 @@ resource "kubernetes_deployment" "broker" {
           }
 
           resources {
-            limits   = locals.broker_limits
-            requests = locals.broker_requests
+            limits   = var.broker_limits
+            requests = var.broker_requests
           }
 
           volume_mount {
@@ -153,7 +153,7 @@ resource "kubernetes_deployment" "broker" {
         }
 
         dynamic "toleration" {
-          for_each = [for t in var.tolerations_broker : {
+          for_each = [for t in var.broker_tolerations : {
             effect             = t.effect
             key                = t.key
             operator           = t.operator

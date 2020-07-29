@@ -117,8 +117,8 @@ resource "kubernetes_deployment" "coordinator" {
           }
 
           resources {
-            limits   = locals.coordinator_limits
-            requests = locals.coordinator_requests
+            limits   = var.coordinator_limits
+            requests = var.coordinator_requests
           }
 
           volume_mount {
@@ -165,7 +165,7 @@ resource "kubernetes_deployment" "coordinator" {
         }
 
         dynamic "toleration" {
-          for_each = [for t in var.tolerations_coordinator : {
+          for_each = [for t in var.coordinator_tolerations : {
             effect             = t.effect
             key                = t.key
             operator           = t.operator

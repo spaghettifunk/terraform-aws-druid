@@ -117,8 +117,8 @@ resource "kubernetes_deployment" "historical" {
           }
 
           resources {
-            limits   = locals.historical_limits
-            requests = locals.historical_requests
+            limits   = var.historical_limits
+            requests = var.historical_requests
           }
 
           volume_mount {
@@ -166,7 +166,7 @@ resource "kubernetes_deployment" "historical" {
         }
 
         dynamic "toleration" {
-          for_each = [for t in var.tolerations_historical : {
+          for_each = [for t in var.historical_tolerations : {
             effect             = t.effect
             key                = t.key
             operator           = t.operator

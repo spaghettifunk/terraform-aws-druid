@@ -117,8 +117,8 @@ resource "kubernetes_deployment" "overlord" {
           }
 
           resources {
-            limits   = locals.overlord_limits
-            requests = locals.overlord_requests
+            limits   = var.overlord_limits
+            requests = var.overlord_requests
           }
 
           volume_mount {
@@ -165,7 +165,7 @@ resource "kubernetes_deployment" "overlord" {
         }
 
         dynamic "toleration" {
-          for_each = [for t in var.tolerations_overlord : {
+          for_each = [for t in var.overlord_tolerations : {
             effect             = t.effect
             key                = t.key
             operator           = t.operator

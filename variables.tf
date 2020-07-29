@@ -54,7 +54,7 @@ variable "broker_limits_memory" {
   default     = "8Gi"
 }
 
-variable "tolerations_broker" {
+variable "broker_tolerations" {
   description = "toleration to apply to the deployment of the broker"
   type = list(object({
     effect             = string
@@ -97,7 +97,7 @@ variable "coordinator_limits_memory" {
   default     = "2Gi"
 }
 
-variable "tolerations_coordinator" {
+variable "coordinator_tolerations" {
   description = "toleration to apply to the deployment of the coordinator"
   type = list(object({
     effect             = string
@@ -140,7 +140,7 @@ variable "historical_limits_memory" {
   default     = "8Gi"
 }
 
-variable "tolerations_historical" {
+variable "historical_tolerations" {
   description = "toleration to apply to the deployment of the historical"
   type = list(object({
     effect             = string
@@ -183,7 +183,7 @@ variable "middlemanager_limits_memory" {
   default     = "8Gi"
 }
 
-variable "tolerations_middlemanager" {
+variable "middlemanager_tolerations" {
   description = "toleration to apply to the deployment of the middlemanager"
   type = list(object({
     effect             = string
@@ -226,7 +226,7 @@ variable "overlord_limits_memory" {
   default     = "2Gi"
 }
 
-variable "tolerations_overlord" {
+variable "overlord_tolerations" {
   description = "toleration to apply to the deployment of the overlord"
   type = list(object({
     effect             = string
@@ -269,7 +269,7 @@ variable "router_limits_memory" {
   default     = "512Mi"
 }
 
-variable "tolerations_router" {
+variable "router_tolerations" {
   description = "toleration to apply to the deployment of the router"
   type = list(object({
     effect             = string

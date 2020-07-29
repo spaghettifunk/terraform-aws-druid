@@ -117,8 +117,8 @@ resource "kubernetes_deployment" "router" {
           }
 
           resources {
-            limits   = locals.router_limits
-            requests = locals.router_requests
+            limits   = var.router_limits
+            requests = var.router_requests
           }
 
           volume_mount {
@@ -165,7 +165,7 @@ resource "kubernetes_deployment" "router" {
         }
 
         dynamic "toleration" {
-          for_each = [for t in var.tolerations_router : {
+          for_each = [for t in var.router_tolerations : {
             effect             = t.effect
             key                = t.key
             operator           = t.operator

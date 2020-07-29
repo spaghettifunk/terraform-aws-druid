@@ -117,8 +117,8 @@ resource "kubernetes_deployment" "middlemanager" {
           }
 
           resources {
-            limits   = locals.middlemanager_limits
-            requests = locals.middlemanager_requests
+            limits   = var.middlemanager_limits
+            requests = var.middlemanager_requests
           }
 
           volume_mount {
@@ -166,7 +166,7 @@ resource "kubernetes_deployment" "middlemanager" {
         }
 
         dynamic "toleration" {
-          for_each = [for t in var.tolerations_middlemanager : {
+          for_each = [for t in var.middlemanager_tolerations : {
             effect             = t.effect
             key                = t.key
             operator           = t.operator
