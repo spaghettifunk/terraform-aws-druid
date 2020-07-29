@@ -1,83 +1,46 @@
-resource "kubernetes_service" "historical_hs" {
+resource "kubernetes_service" "router_cs" {
   metadata {
-    name      = "historical-hs"
+    name      = "router-cs"
     namespace = var.namespace
-
-    labels = {
-      app = "historical"
-    }
+    labels    = local.router_labels
   }
-
   spec {
     port {
-      name = "historical"
-      port = 8083
+      name = "router"
+      port = 8888
     }
-
-    selector = {
-      app = "historical"
-    }
-
-    cluster_ip = "None"
+    selector = local.router_labels
   }
 }
 
-resource "kubernetes_service" "historical_cs" {
+resource "kubernetes_deployment" "router" {
   metadata {
-    name      = "historical-cs"
+    name      = "router"
     namespace = var.namespace
-
-    labels = {
-      app = "historical"
-    }
+    labels    = local.router_labels
   }
 
   spec {
-    port {
-      name = "historical"
-      port = 8083
-    }
-
-    selector = {
-      app = "historical"
-    }
-  }
-}
-
-resource "kubernetes_deployment" "historical" {
-  metadata {
-    name      = "historical"
-    namespace = var.namespace
-
-    labels = {
-      app = "historical"
-    }
-  }
-
-  spec {
-    replicas = var.historical_replicas
+    replicas = var.router_replicas
 
     selector {
-      match_labels = {
-        app = "historical"
-      }
+      match_labels = local.router_labels
     }
 
     template {
       metadata {
-        labels = {
-          app = "historical"
-        }
+        labels = local.router_labels
       }
 
       spec {
         container {
-          name  = "historical"
-          image = var.druid_image
+          name              = "router"
+          image             = local.druid_image
+          image_pull_policy = "Always"
 
           port {
-            name           = "historical"
-            container_port = 8083
+            name           = "router"
+            container_port = 8888
           }
 
           env_from {
@@ -93,11 +56,6 @@ resource "kubernetes_deployment" "historical" {
           }
 
           env {
-            name  = "DRUID_SERVICE_PORT"
-            value = "8083"
-          }
-
-          env {
             name = "DRUID_HOST"
             value_from {
               field_ref {
@@ -106,19 +64,23 @@ resource "kubernetes_deployment" "historical" {
             }
           }
 
-          env {
-            name  = "DRUID_SERVICE"
-            value = "historical"
-          }
-
-          env {
-            name  = "DRUID_JVM_ARGS"
-            value = "-server -Xms8G -Xmx8G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -XX:+UseConcMarkSweepGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
+          dynamic "env" {
+            for_each = local.router_env_variables
+            content {
+              name  = env.value.name
+              value = env.value.value
+            }
           }
 
           resources {
-            limits   = var.historical_limits
-            requests = var.historical_requests
+            limits {
+              cpu    = var.router_limits_cpu
+              memory = var.router_limits_memory
+            }
+            requests {
+              cpu    = var.router_requests_cpu
+              memory = var.router_requests_memory
+            }
           }
 
           volume_mount {
@@ -129,7 +91,7 @@ resource "kubernetes_deployment" "historical" {
           liveness_probe {
             http_get {
               path = "/status/health"
-              port = "8083"
+              port = "8888"
             }
 
             initial_delay_seconds = 60
@@ -138,13 +100,12 @@ resource "kubernetes_deployment" "historical" {
           readiness_probe {
             http_get {
               path = "/status/health"
-              port = "8083"
+              port = "8888"
             }
 
             initial_delay_seconds = 60
           }
 
-          image_pull_policy = "Always"
 
           security_context {
             capabilities {
@@ -155,7 +116,6 @@ resource "kubernetes_deployment" "historical" {
 
         volume {
           name = "druid-secret"
-
           secret {
             secret_name = "druid-secret"
           }
@@ -166,7 +126,7 @@ resource "kubernetes_deployment" "historical" {
         }
 
         dynamic "toleration" {
-          for_each = [for t in var.historical_tolerations : {
+          for_each = [for t in var.router_tolerations : {
             effect             = t.effect
             key                = t.key
             operator           = t.operator
@@ -180,21 +140,6 @@ resource "kubernetes_deployment" "historical" {
             operator           = toleration.value.operator
             toleration_seconds = toleration.value.toleration_seconds
             value              = toleration.value.value
-          }
-        }
-
-        affinity {
-          pod_anti_affinity {
-            required_during_scheduling_ignored_during_execution {
-              label_selector {
-                match_expressions {
-                  key      = "app"
-                  operator = "In"
-                  values   = ["historical"]
-                }
-              }
-              topology_key = "kubernetes.io/hostname"
-            }
           }
         }
 

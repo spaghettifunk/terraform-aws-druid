@@ -1,89 +1,50 @@
-resource "kubernetes_service" "router_hs" {
+resource "kubernetes_service" "overlord_cs" {
   metadata {
-    name      = "router-hs"
+    name      = "overlord-cs"
     namespace = var.namespace
 
     labels = {
-      app = "router"
+      app = "overlord"
     }
   }
 
   spec {
     port {
-      name = "router"
-      port = 8888
+      name = "overlord"
+      port = 8090
     }
 
     selector = {
-      app = "router"
-    }
-
-    cluster_ip = "None"
-  }
-}
-
-resource "kubernetes_service" "router_cs" {
-  metadata {
-    name      = "router-cs"
-    namespace = var.namespace
-
-    labels = {
-      app = "router"
-    }
-  }
-
-  spec {
-    port {
-      name = "router"
-      port = 8888
-    }
-
-    selector = {
-      app = "router"
+      app = "overlord"
     }
   }
 }
 
-resource "kubernetes_deployment" "router" {
+resource "kubernetes_deployment" "overlord" {
   metadata {
-    name      = "router"
+    name      = "overlord"
     namespace = var.namespace
-
-    labels = {
-      app = "router"
-    }
+    labels    = local.overlord_labels
   }
 
   spec {
-    replicas = var.router_replicas
-
+    replicas = var.overlord_replicas
     selector {
-      match_labels = {
-        app = "router"
-      }
+      match_labels = local.overlord_labels
     }
-
     template {
       metadata {
-        labels = {
-          app = "router"
-        }
+        labels = local.overlord_labels
       }
-
       spec {
         container {
-          name  = "router"
-          image = var.druid_image
+          name  = "overlord"
+          image = local.druid_image
+          image_pull_policy = "Always"
 
           port {
-            name           = "router"
-            container_port = 8888
-          }
-
-          env_from {
-            config_map_ref {
-              name = "druid-common-config"
-            }
+            name           = "overlord"
+            container_port = 8090
           }
 
           env_from {
@@ -92,9 +53,10 @@ resource "kubernetes_deployment" "router" {
             }
           }
 
-          env {
-            name  = "DRUID_SERVICE_PORT"
-            value = "8888"
+          env_from {
+            config_map_ref {
+              name = "druid-common-config"
+            }
           }
 
           env {
@@ -106,19 +68,23 @@ resource "kubernetes_deployment" "router" {
             }
           }
 
-          env {
-            name  = "DRUID_SERVICE"
-            value = "router"
-          }
-
-          env {
-            name  = "DRUID_JVM_ARGS"
-            value = "-server -Xms512m -Xmx512m -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
+          dynamic "env" {
+            for_each = local.overlord_env_variables
+            content {
+              name  = env.value.name
+              value = env.value.value
+            }
           }
 
           resources {
-            limits   = var.router_limits
-            requests = var.router_requests
+            limits {
+              cpu    = var.overlord_limits_cpu
+              memory = var.overlord_limits_memory
+            }
+            requests {
+              cpu    = var.overlord_requests_cpu
+              memory = var.overlord_requests_memory
+            }
           }
 
           volume_mount {
@@ -129,22 +95,19 @@ resource "kubernetes_deployment" "router" {
           liveness_probe {
             http_get {
               path = "/status/health"
-              port = "8888"
+              port = "8090"
             }
-
             initial_delay_seconds = 60
           }
 
           readiness_probe {
             http_get {
               path = "/status/health"
-              port = "8888"
+              port = "8090"
             }
-
             initial_delay_seconds = 60
           }
 
-          image_pull_policy = "Always"
 
           security_context {
             capabilities {
@@ -165,7 +128,7 @@ resource "kubernetes_deployment" "router" {
         }
 
         dynamic "toleration" {
-          for_each = [for t in var.router_tolerations : {
+          for_each = [for t in var.overlord_tolerations : {
             effect             = t.effect
             key                = t.key
             operator           = t.operator
@@ -179,6 +142,21 @@ resource "kubernetes_deployment" "router" {
             operator           = toleration.value.operator
             toleration_seconds = toleration.value.toleration_seconds
             value              = toleration.value.value
+          }
+        }
+
+        affinity {
+          pod_anti_affinity {
+            required_during_scheduling_ignored_during_execution {
+              label_selector {
+                match_expressions {
+                  key      = "app"
+                  operator = "In"
+                  values   = ["overlord"]
+                }
+              }
+              topology_key = "kubernetes.io/hostname"
+            }
           }
         }
 

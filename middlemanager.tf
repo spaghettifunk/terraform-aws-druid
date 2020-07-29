@@ -1,83 +1,43 @@
-resource "kubernetes_service" "overlord_hs" {
+resource "kubernetes_service" "mm_cs" {
   metadata {
-    name      = "overlord-hs"
+    name      = "mm-cs"
     namespace = var.namespace
-
-    labels = {
-      app = "overlord"
-    }
+    labels    = local.middlemanager_labels
   }
-
   spec {
     port {
-      name = "overlord"
-      port = 8090
+      name = "mm"
+      port = 8084
     }
-
-    selector = {
-      app = "overlord"
-    }
-
-    cluster_ip = "None"
+    selector = local.middlemanager_labels
   }
 }
 
-resource "kubernetes_service" "overlord_cs" {
+resource "kubernetes_deployment" "middlemanager" {
   metadata {
-    name      = "overlord-cs"
+    name      = "middlemanager"
     namespace = var.namespace
-
-    labels = {
-      app = "overlord"
-    }
+    labels    = local.middlemanager_labels
   }
 
   spec {
-    port {
-      name = "overlord"
-      port = 8090
-    }
-
-    selector = {
-      app = "overlord"
-    }
-  }
-}
-
-resource "kubernetes_deployment" "overlord" {
-  metadata {
-    name      = "overlord"
-    namespace = var.namespace
-
-    labels = {
-      app = "overlord"
-    }
-  }
-
-  spec {
-    replicas = var.overlord_replicas
-
+    replicas = var.middlemanager_replicas
     selector {
-      match_labels = {
-        app = "overlord"
-      }
+      match_labels = local.middlemanager_labels
     }
-
     template {
       metadata {
-        labels = {
-          app = "overlord"
-        }
+        labels = local.middlemanager_labels
       }
-
       spec {
         container {
-          name  = "overlord"
-          image = var.druid_image
+          name              = "middlemanager"
+          image             = local.druid_image
+          image_pull_policy = "Always"
 
           port {
-            name           = "overlord"
-            container_port = 8090
+            name           = "middlemanager"
+            container_port = 8084
           }
 
           env_from {
@@ -86,9 +46,10 @@ resource "kubernetes_deployment" "overlord" {
             }
           }
 
-          env {
-            name  = "DRUID_SERVICE_PORT"
-            value = "8090"
+          env_from {
+            secret_ref {
+              name = "druid-secret"
+            }
           }
 
           env {
@@ -100,25 +61,23 @@ resource "kubernetes_deployment" "overlord" {
             }
           }
 
-          env {
-            name  = "DRUID_SERVICE"
-            value = "overlord"
-          }
-
-          env {
-            name  = "DRUID_JVM_ARGS"
-            value = "-server -Xms2G -Xmx2G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
-          }
-
-          env_from {
-            secret_ref {
-              name = "druid-secret"
+          dynamic "env" {
+            for_each = local.broker_env_variables
+            content {
+              name  = env.value.name
+              value = env.value.value
             }
           }
 
           resources {
-            limits   = var.overlord_limits
-            requests = var.overlord_requests
+            limits {
+              cpu    = var.middlemanager_limits_cpu
+              memory = var.middlemanager_limits_memory
+            }
+            requests {
+              cpu    = var.middlemanager_requests_cpu
+              memory = var.middlemanager_requests_memory
+            }
           }
 
           volume_mount {
@@ -129,7 +88,7 @@ resource "kubernetes_deployment" "overlord" {
           liveness_probe {
             http_get {
               path = "/status/health"
-              port = "8090"
+              port = "8084"
             }
 
             initial_delay_seconds = 60
@@ -138,13 +97,12 @@ resource "kubernetes_deployment" "overlord" {
           readiness_probe {
             http_get {
               path = "/status/health"
-              port = "8090"
+              port = "8084"
             }
 
             initial_delay_seconds = 60
           }
 
-          image_pull_policy = "Always"
 
           security_context {
             capabilities {
@@ -155,6 +113,7 @@ resource "kubernetes_deployment" "overlord" {
 
         volume {
           name = "druid-secret"
+
           secret {
             secret_name = "druid-secret"
           }
@@ -165,7 +124,7 @@ resource "kubernetes_deployment" "overlord" {
         }
 
         dynamic "toleration" {
-          for_each = [for t in var.overlord_tolerations : {
+          for_each = [for t in var.middlemanager_tolerations : {
             effect             = t.effect
             key                = t.key
             operator           = t.operator
@@ -189,7 +148,7 @@ resource "kubernetes_deployment" "overlord" {
                 match_expressions {
                   key      = "app"
                   operator = "In"
-                  values   = ["overlord"]
+                  values   = ["middlemanager"]
                 }
               }
               topology_key = "kubernetes.io/hostname"

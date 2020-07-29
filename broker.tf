@@ -1,45 +1,14 @@
-resource "kubernetes_service" "broker_hs" {
-  metadata {
-    name      = "broker-hs"
-    namespace = var.namespace
-
-    labels = {
-      app = "broker"
-    }
-  }
-
-  spec {
-    port {
-      name = "broker"
-      port = 8082
-    }
-
-    selector = {
-      app = "broker"
-    }
-
-    cluster_ip = "None"
-  }
-}
-
 resource "kubernetes_service" "broker_cs" {
   metadata {
     name      = "broker-cs"
     namespace = var.namespace
-
-    labels = {
-      app = "broker"
-    }
+    labels    = local.broker_labels
   }
-
   spec {
+    selector = local.broker_labels
     port {
       name = "broker"
       port = 8082
-    }
-
-    selector = {
-      app = "broker"
     }
   }
 }
@@ -48,54 +17,36 @@ resource "kubernetes_deployment" "broker" {
   metadata {
     name      = "broker"
     namespace = var.namespace
-
-    labels = {
-      app = "broker"
-    }
+    labels    = local.broker_labels
   }
-
   spec {
     replicas = var.broker_replicas
     selector {
-      match_labels = {
-        app = "broker"
-      }
+      match_labels = local.broker_labels
     }
-
     template {
       metadata {
-        labels = {
-          app = "broker"
-        }
+        labels = local.broker_labels
       }
-
       spec {
         container {
-          name  = "broker"
-          image = var.druid_image
-
+          name              = "broker"
+          image             = local.druid_image
+          image_pull_policy = "Always"
           port {
             name           = "broker"
             container_port = 8082
           }
-
           env_from {
             config_map_ref {
               name = "druid-common-config"
             }
           }
-
           env_from {
             secret_ref {
               name = "druid-secret"
             }
           }
-
-          env {
-            name  = "DRUID_SERVICE_PORT"
-            value = "8082"
-          }
-
           env {
             name = "DRUID_HOST"
             value_from {
@@ -104,27 +55,27 @@ resource "kubernetes_deployment" "broker" {
               }
             }
           }
-
-          env {
-            name  = "DRUID_SERVICE"
-            value = "broker"
+          dynamic "env" {
+            for_each = local.broker_env_variables
+            content {
+              name  = env.value.name
+              value = env.value.value
+            }
           }
-
-          env {
-            name  = "DRUID_JVM_ARGS"
-            value = "-server -Xms8G -Xmx8G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -XX:+UseG1GC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
-          }
-
           resources {
-            limits   = var.broker_limits
-            requests = var.broker_requests
+            limits {
+              cpu    = var.broker_limits_cpu
+              memory = var.broker_limits_memory
+            }
+            requests {
+              cpu    = var.broker_requests_cpu
+              memory = var.broker_requests_memory
+            }
           }
-
           volume_mount {
             name       = "data"
             mount_path = "/var/druid/"
           }
-
           liveness_probe {
             http_get {
               path = "/status/health"
@@ -133,7 +84,6 @@ resource "kubernetes_deployment" "broker" {
 
             initial_delay_seconds = 60
           }
-
           readiness_probe {
             http_get {
               path = "/status/health"
@@ -142,16 +92,12 @@ resource "kubernetes_deployment" "broker" {
 
             initial_delay_seconds = 60
           }
-
-          image_pull_policy = "Always"
-
           security_context {
             capabilities {
               add = ["IPC_LOCK"]
             }
           }
         }
-
         dynamic "toleration" {
           for_each = [for t in var.broker_tolerations : {
             effect             = t.effect
@@ -169,19 +115,15 @@ resource "kubernetes_deployment" "broker" {
             value              = toleration.value.value
           }
         }
-
         volume {
           name = "druid-secret"
-
           secret {
             secret_name = "druid-secret"
           }
         }
-
         volume {
           name = "data"
         }
-
         affinity {
           pod_anti_affinity {
             required_during_scheduling_ignored_during_execution {
@@ -196,7 +138,6 @@ resource "kubernetes_deployment" "broker" {
             }
           }
         }
-
         termination_grace_period_seconds = 1800
       }
     }
