@@ -1,27 +1,3 @@
-resource "kubernetes_service" "overlord_hs" {
-  metadata {
-    name      = "overlord-hs"
-    namespace = var.namespace
-
-    labels = {
-      app = "overlord"
-    }
-  }
-
-  spec {
-    port {
-      name = "overlord"
-      port = 8090
-    }
-
-    selector = {
-      app = "overlord"
-    }
-
-    cluster_ip = "None"
-  }
-}
-
 resource "kubernetes_service" "overlord_cs" {
   metadata {
     name      = "overlord-cs"

@@ -1,27 +1,3 @@
-resource "kubernetes_service" "mm_hs" {
-  metadata {
-    name      = "mm-hs"
-    namespace = var.namespace
-
-    labels = {
-      app = "middlemanager"
-    }
-  }
-
-  spec {
-    port {
-      name = "mm"
-      port = 8084
-    }
-
-    selector = {
-      app = "middlemanager"
-    }
-
-    cluster_ip = "None"
-  }
-}
-
 resource "kubernetes_service" "mm_cs" {
   metadata {
     name      = "mm-cs"

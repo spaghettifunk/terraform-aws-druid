@@ -1,27 +1,3 @@
-resource "kubernetes_service" "coordinator_hs" {
-  metadata {
-    name      = "coordinator-hs"
-    namespace = var.namespace
-
-    labels = {
-      app = "coordinator"
-    }
-  }
-
-  spec {
-    port {
-      name = "coordinator"
-      port = 8081
-    }
-
-    selector = {
-      app = "coordinator"
-    }
-
-    cluster_ip = "None"
-  }
-}
-
 resource "kubernetes_service" "coordinator_cs" {
   metadata {
     name      = "coordinator-cs"
@@ -107,7 +83,7 @@ resource "kubernetes_deployment" "coordinator" {
 
           env {
             name  = "DRUID_JVM_ARGS"
-            value = "-server -Xm2G -Xmx2G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -Dderby.stream.error.file=var/druid/derby.log"
+            value = "-server -Xms2G -Xmx2G -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -Dderby.stream.error.file=var/druid/derby.log"
           }
 
           env_from {

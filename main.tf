@@ -67,4 +67,11 @@ module "druid" {
   router_tolerations        = var.router_tolerations
   router_requests           = local.router_requests
   router_limits             = local.router_limits
+  
+  enable_brokers_ingress      = var.enable_brokers_ingress
+  brokers_annotations_ingress = var.brokers_annotations_ingress
+  brokers_host                = var.brokers_host
+  enable_router_ingress       = var.enable_router_ingress
+  router_annotations_ingress  = var.router_annotations_ingress
+  router_host                 = var.router_host
 }
