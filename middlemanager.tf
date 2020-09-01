@@ -62,7 +62,7 @@ resource "kubernetes_deployment" "middlemanager" {
           }
 
           dynamic "env" {
-            for_each = local.broker_env_variables
+            for_each = local.middlemanager_env_variables
             content {
               name  = env.value.name
               value = env.value.value
